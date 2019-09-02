@@ -1,17 +1,5 @@
 # my-blog-api-sam
 
-This is a sample template for my-blog-api-sam - Below is a brief explanation of what we have generated for you:
-
-```bash
-.
-├── Makefile                    <-- Make to automate build
-├── README.md                   <-- This instructions file
-├── hello-world                 <-- Source code for a lambda function
-│   ├── main.go                 <-- Lambda function code
-│   └── main_test.go            <-- Unit tests
-└── template.yaml
-```
-
 ## Requirements
 
 * AWS CLI already configured with Administrator permission
@@ -30,6 +18,13 @@ go get -u github.com/aws/aws-lambda-go/...
 
 **NOTE:** As you change your application code as well as dependencies during development, you might want to research how to handle dependencies in Golang at scale.
 
+And create env.json.
+
+```shell
+cp env.template.json env.json
+vim env.json
+```
+
 ### Building
 
 Golang is a statically compiled language, meaning that in order to run it you have to build the executable target.
@@ -38,6 +33,8 @@ You can issue the following command in a shell to build it:
 
 ```shell
 GOOS=linux GOARCH=amd64 go build -o hello-world/hello-world ./hello-world
+or
+make build
 ```
 
 **NOTE**: If you're not building the function on a Linux machine, you will need to specify the `GOOS` and `GOARCH` environment variables, this allows Golang to build your function for another system architecture and ensure compatibility.
@@ -47,7 +44,7 @@ GOOS=linux GOARCH=amd64 go build -o hello-world/hello-world ./hello-world
 **Invoking function locally through local API Gateway**
 
 ```bash
-sam local start-api
+sam local start-api --env-vars env.json
 ```
 
 If the previous command ran successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/hello`
