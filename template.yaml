@@ -30,6 +30,16 @@ Resources:
           Properties:
             Path: /recommended_books
             Method: GET
+        PostsIndexApi:
+          Type: Api
+          Properties:
+            Path: /posts
+            Method: GET
+        PostsShowApi:
+          Type: Api
+          Properties:
+            Path: /posts/{id}
+            Method: GET
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           USERNAME: username
