@@ -94,7 +94,8 @@ func recommendedBooks(request events.APIGatewayProxyRequest) (events.APIGatewayP
 		return internalServerError()
 	}
 	return events.APIGatewayProxyResponse{
-		Body: fmt.Sprintf("%s", resp),
+		Body:       fmt.Sprintf("%s", resp),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
 		StatusCode: 200,
 	}, nil
 }
@@ -151,14 +152,15 @@ func posts(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 
 	data := struct {
 		TotalPage int
-		Posts model.Posts
+		Posts     model.Posts
 	}{totalPage, posts}
 	resp, err := json.Marshal(data)
 	if err != nil {
 		return internalServerError()
 	}
 	return events.APIGatewayProxyResponse{
-		Body: fmt.Sprintf("%s", resp),
+		Body:       fmt.Sprintf("%s", resp),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
 		StatusCode: 200,
 	}, nil
 }
@@ -189,28 +191,32 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 		return internalServerError()
 	}
 	return events.APIGatewayProxyResponse{
-		Body: fmt.Sprintf("%s", resp),
+		Body:       fmt.Sprintf("%s", resp),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
 		StatusCode: 200,
 	}, nil
 }
 
 func invalidParameter() (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
-		Body: fmt.Sprint("Invalid Parameter"),
+		Body:       fmt.Sprint("Invalid Parameter"),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
 		StatusCode: 400,
 	}, nil
 }
 
 func notFound() (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
-		Body: fmt.Sprint("Not Found"),
+		Body:       fmt.Sprint("Not Found"),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
 		StatusCode: 404,
 	}, nil
 }
 
 func internalServerError() (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
-		Body: fmt.Sprint("Internal Server Error"),
+		Body:       fmt.Sprint("Internal Server Error"),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
 		StatusCode: 500,
 	}, nil
 }
