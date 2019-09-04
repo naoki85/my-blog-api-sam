@@ -19,7 +19,6 @@ func NewSqlHandler() (database.SqlHandler, error) {
 	port := os.Getenv("PORT")
 	dbName := os.Getenv("DBNAME")
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=Local", username, password, host, port, dbName)
-	fmt.Printf("dbName: %s", dsn)
 	conn, err := sql.Open("mysql", dsn)
 	if err != nil {
 		panic(err.Error)

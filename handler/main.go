@@ -10,6 +10,9 @@ import (
 	"github.com/naoki85/my-blog-api-sam/usecase"
 	"io/ioutil"
 	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -31,6 +34,10 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return hello(request)
 	} else if request.Path == "/recommended_books" {
 		return recommendedBooks(request)
+	} else if request.Path == "/posts" {
+		return posts(request)
+	} else if regexp.MustCompile(`^/posts/(\d+)`).MatchString(request.Path) {
+		return post(request)
 	}
 	return notFound()
 }
@@ -87,21 +94,129 @@ func recommendedBooks(request events.APIGatewayProxyRequest) (events.APIGatewayP
 		return internalServerError()
 	}
 	return events.APIGatewayProxyResponse{
-		Body: fmt.Sprintf("%s", resp),
+		Body:       fmt.Sprintf("%s", resp),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
 		StatusCode: 200,
+	}, nil
+}
+
+func posts(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	page, err := strconv.Atoi(request.QueryStringParameters["page"])
+	if err != nil {
+		return invalidParameter()
+	}
+
+	sqlHandler, _ := infrastructure.NewSqlHandler()
+	interactor := usecase.PostInteractor{
+		PostRepository: &database.PostRepository{
+			SqlHandler: sqlHandler,
+		},
+		PostCategoryRepository: &database.PostCategoryRepository{
+			SqlHandler: sqlHandler,
+		},
+	}
+	posts, err := interactor.Index(page)
+
+	if err != nil {
+		fmt.Printf("Error: %v", err.Error())
+		return notFound()
+	}
+
+	var retPosts model.Posts
+
+	if len(posts) == 0 {
+		retPosts = model.Posts{}
+	}
+
+	for _, p := range posts {
+		if p.ImageUrl == "" {
+			p.ImageUrl = "https://s3-ap-northeast-1.amazonaws.com/bookrecorder-image/commons/default_user_icon.png"
+		} else {
+			p.ImageUrl = "http://d29xhtkvbwm2ne.cloudfront.net/" + p.ImageUrl
+		}
+		p.PublishedAt = strings.Split(p.PublishedAt, "T")[0]
+
+		retPosts = append(retPosts, p)
+	}
+
+	count, err := interactor.GetPostsCount()
+	if err != nil {
+		fmt.Printf("Error: %v", err.Error())
+		return internalServerError()
+	}
+	totalPage := count / 10
+	mod := count % 10
+	if mod != 0 {
+		totalPage = totalPage + 1
+	}
+
+	data := struct {
+		TotalPage int
+		Posts     model.Posts
+	}{totalPage, posts}
+	resp, err := json.Marshal(data)
+	if err != nil {
+		return internalServerError()
+	}
+	return events.APIGatewayProxyResponse{
+		Body:       fmt.Sprintf("%s", resp),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+		StatusCode: 200,
+	}, nil
+}
+
+func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	postId, err := strconv.Atoi(request.PathParameters["id"])
+	if err != nil {
+		return invalidParameter()
+	}
+
+	sqlHandler, _ := infrastructure.NewSqlHandler()
+	interactor := usecase.PostInteractor{
+		PostRepository: &database.PostRepository{
+			SqlHandler: sqlHandler,
+		},
+		PostCategoryRepository: &database.PostCategoryRepository{
+			SqlHandler: sqlHandler,
+		},
+	}
+
+	post, err := interactor.FindById(postId)
+	if err != nil || post.Id == 0 {
+		return notFound()
+	}
+
+	resp, err := json.Marshal(post)
+	if err != nil {
+		return internalServerError()
+	}
+	return events.APIGatewayProxyResponse{
+		Body:       fmt.Sprintf("%s", resp),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+		StatusCode: 200,
+	}, nil
+}
+
+func invalidParameter() (events.APIGatewayProxyResponse, error) {
+	return events.APIGatewayProxyResponse{
+		Body:       fmt.Sprint("Invalid Parameter"),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+		StatusCode: 400,
 	}, nil
 }
 
 func notFound() (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
-		Body: fmt.Sprint("Not Found"),
+		Body:       fmt.Sprint("Not Found"),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
 		StatusCode: 404,
 	}, nil
 }
 
 func internalServerError() (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
-		Body: fmt.Sprint("Internal Server Error"),
+		Body:       fmt.Sprint("Internal Server Error"),
+		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
 		StatusCode: 500,
 	}, nil
 }
