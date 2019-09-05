@@ -20,7 +20,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	} else if regexp.MustCompile(`^/posts/(\d+)`).MatchString(request.Path) {
 		return post(request)
 	}
-	return notFound()
+	return handleError(404), nil
 }
 
 func main() {
@@ -33,40 +33,32 @@ func recommendedBooks(request events.APIGatewayProxyRequest) (events.APIGatewayP
 	recommendedBooks, status := controller.Index()
 
 	if status != config.SuccessStatus {
-		return notFound()
+		return handleError(status), nil
 	}
 
-	return events.APIGatewayProxyResponse{
-		Body:       fmt.Sprintf("%s", recommendedBooks),
-		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
-		StatusCode: status,
-	}, nil
+	return apiResponse(fmt.Sprintf("%s", recommendedBooks), status), nil
 }
 
 func posts(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	page, err := strconv.Atoi(request.QueryStringParameters["page"])
 	if err != nil {
-		return invalidParameter()
+		return handleError(400), nil
 	}
 
 	sqlHandler, _ := infrastructure.NewSqlHandler()
 	controller := controller.NewPostController(sqlHandler)
 	resp, status := controller.Index(page)
 	if status != config.SuccessStatus {
-		return notFound()
+		return handleError(status), nil
 	}
 
-	return events.APIGatewayProxyResponse{
-		Body:       fmt.Sprintf("%s", resp),
-		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
-		StatusCode: status,
-	}, nil
+	return apiResponse(fmt.Sprintf("%s", resp), status), nil
 }
 
 func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	postId, err := strconv.Atoi(request.PathParameters["id"])
 	if err != nil {
-		return invalidParameter()
+		return handleError(400), nil
 	}
 
 	sqlHandler, _ := infrastructure.NewSqlHandler()
@@ -74,36 +66,30 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 
 	post, status := controller.Show(postId)
 	if status != config.SuccessStatus {
-		return notFound()
+		return handleError(status), nil
 	}
 
-	return events.APIGatewayProxyResponse{
-		Body:       fmt.Sprintf("%s", post),
-		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
-		StatusCode: 200,
-	}, nil
+	return apiResponse(fmt.Sprintf("%s", post), status), nil
 }
 
-func invalidParameter() (events.APIGatewayProxyResponse, error) {
-	return events.APIGatewayProxyResponse{
-		Body:       fmt.Sprint("Invalid Parameter"),
-		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
-		StatusCode: config.InvalidParameterStatus,
-	}, nil
+func handleError(status int) events.APIGatewayProxyResponse {
+	var message string
+	switch status {
+	case config.InvalidParameterStatus:
+		message = "Invalid Parameter"
+	case config.NotFoundStatus:
+		message = "Not Found"
+	default:
+		message = "Internal Server Error"
+	}
+
+	return apiResponse(message, status)
 }
 
-func notFound() (events.APIGatewayProxyResponse, error) {
+func apiResponse(message string, status int) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
-		Body:       fmt.Sprint("Not Found"),
+		Body:       message,
 		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
-		StatusCode: config.NotFoundStatus,
-	}, nil
-}
-
-func internalServerError() (events.APIGatewayProxyResponse, error) {
-	return events.APIGatewayProxyResponse{
-		Body:       fmt.Sprint("Internal Server Error"),
-		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
-		StatusCode: config.InternalServerErrorStatus,
-	}, nil
+		StatusCode: status,
+	}
 }
