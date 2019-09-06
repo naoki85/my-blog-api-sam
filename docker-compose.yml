@@ -1,0 +1,25 @@
+version: '3'
+services:
+  db:
+    container_name: mysqlDb
+    build:
+      context: .
+      dockerfile: ./docker/db/Dockerfile
+    ports:
+      - 3306:3306
+    volumes:
+      - bookrecorder-mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: test
+      MYSQL_PASSWORD: testpassword
+      TZ: 'Asia/Tokyo'
+    networks:
+      - lambda-local
+volumes:
+  bookrecorder-mysql-data:
+    external:
+      name: bookrecorder-mysql-data
+networks:
+  lambda-local:
+    external: true

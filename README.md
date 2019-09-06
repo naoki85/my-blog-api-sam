@@ -8,13 +8,11 @@
 
 ## Setup process
 
-### Installing dependencies
-
-create env.json.
+Start Mysql container.
 
 ```shell
-cp env.template.json env.json
-vim env.json
+docker network create lambda-local
+docker-compose up db
 ```
 
 ### Building
@@ -28,7 +26,7 @@ make build
 ### Local development
 
 ```bash
-sam local start-api --env-vars env.json
+sam local start-api --env-vars env.json --docker-network lambda-local
 ```
 
 If the previous command ran successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/hello`
