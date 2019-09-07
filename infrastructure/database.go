@@ -4,21 +4,17 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/interface/database"
-	"os"
 )
 
 type SqlHandler struct {
 	Conn *sql.DB
 }
 
-func NewSqlHandler() (database.SqlHandler, error) {
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
-	host := os.Getenv("HOST")
-	port := os.Getenv("PORT")
-	dbName := os.Getenv("DBNAME")
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=Local", username, password, host, port, dbName)
+func NewSqlHandler(c *config.Config) (database.SqlHandler, error) {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=Local",
+		c.Username, c.Password, c.Host, c.Port, c.Database)
 	conn, err := sql.Open("mysql", dsn)
 	if err != nil {
 		panic(err.Error)

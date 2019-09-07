@@ -28,7 +28,9 @@ func main() {
 }
 
 func recommendedBooks(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	sqlHandler, _ := infrastructure.NewSqlHandler()
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	sqlHandler, _ := infrastructure.NewSqlHandler(c)
 	controller := controller.NewRecommendedBookController(sqlHandler)
 	recommendedBooks, status := controller.Index()
 
@@ -45,7 +47,9 @@ func posts(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 		return handleError(400), nil
 	}
 
-	sqlHandler, _ := infrastructure.NewSqlHandler()
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	sqlHandler, _ := infrastructure.NewSqlHandler(c)
 	controller := controller.NewPostController(sqlHandler)
 	resp, status := controller.Index(page)
 	if status != config.SuccessStatus {
@@ -61,7 +65,9 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 		return handleError(400), nil
 	}
 
-	sqlHandler, _ := infrastructure.NewSqlHandler()
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	sqlHandler, _ := infrastructure.NewSqlHandler(c)
 	controller := controller.NewPostController(sqlHandler)
 
 	post, status := controller.Show(postId)
