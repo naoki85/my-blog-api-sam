@@ -11,6 +11,7 @@
 Start Mysql container.
 
 ```shell
+docker volume create bookrecorder-mysql-data
 docker network create lambda-local
 docker-compose up db
 ```
@@ -65,8 +66,18 @@ aws cloudformation describe-stacks \
 
 ### Testing
 
-We use `testing` package that is built-in in Golang and you can simply run the following command to run our tests:
+First, check status of docker db.
 
 ```shell
-go test -v ./handler
+docker-compose up db
+```
+And, execute all tests.
+
+```shell
+export TEST_FLAG=1
+go test ./infrastructure -v -cover
+go test ./interface/database -v -cover
+go test ./usecase -v -cover
+go test ./interface/controller -v -cover
+go test ./handler -v -cover
 ```
