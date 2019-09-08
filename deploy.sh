@@ -21,9 +21,6 @@ if [ -z "${DBNAME}" ]; then
     exit 1
 fi
 
-read -p "デプロイを実行しますか？ (y/N): " yn
-case "$yn" in [yY]*) ;; *) echo -e "abort.\n" ; exit ;; esac
-
 echo -e ""
 
 sam package \
