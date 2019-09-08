@@ -10,6 +10,13 @@ Description: >
 Globals:
   Function:
     Timeout: 5
+    Environment:
+      Variables:
+        USERNAME: username
+        PASSWORD: password
+        HOST: host
+        PORT: port
+        DBNAME: dbname
 
 Resources:
   MyBlogApiFunction:
@@ -42,10 +49,28 @@ Resources:
           HOST: host
           PORT: port
           DBNAME: dbname
+      Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
+      VpcConfig:
+        SecurityGroupIds: ["sg-0351ecbd14859fcfe"]
+        SubnetIds: ["subnet-3b290b13"]
   ServerlessRestApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
+  MyBlogApiFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - 
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        - "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
