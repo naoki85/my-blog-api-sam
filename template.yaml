@@ -42,6 +42,10 @@ Resources:
           HOST: host
           PORT: port
           DBNAME: dbname
+  ServerlessRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
