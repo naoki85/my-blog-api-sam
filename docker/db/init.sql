@@ -17,6 +17,7 @@
 
 DROP DATABASE IF EXISTS book_recorder_test;
 CREATE DATABASE book_recorder_test;
+USE book_recorder_test;
 
 --
 -- Table structure for table `post_categories`

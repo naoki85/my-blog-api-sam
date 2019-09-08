@@ -11,6 +11,7 @@
 Start Mysql container.
 
 ```shell
+docker volume create bookrecorder-mysql-data
 docker network create lambda-local
 docker-compose up db
 ```
