@@ -37,4 +37,5 @@ sam deploy \
         PASSWORD=${PASSWORD} \
         HOST=${HOST} \
         PORT=${PORT} \
-        DBNAME=${DBNAME}
+        DBNAME=${DBNAME} \
+        TZ='Asia/Tokyo'
