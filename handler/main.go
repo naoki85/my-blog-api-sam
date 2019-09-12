@@ -13,7 +13,7 @@ import (
 )
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	if request.Path == "/heath" {
+	if request.Path == "/health" {
 		return health(request)
 	} else if request.Path == "/recommended_books" {
 		return recommendedBooks(request)
