@@ -1,7 +1,7 @@
 package usecase
 
-import "github.com/naoki85/my-blog-api-sam/interface/database"
+import "github.com/naoki85/my-blog-api-sam/repository"
 
 type UserRepository interface {
-	Create(params database.UserCreateParams) (bool, error)
+	Create(params repository.UserCreateParams) (bool, error)
 }

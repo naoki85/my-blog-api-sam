@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"github.com/naoki85/my-blog-api-sam/model"
+	"log"
 	"strings"
 )
 
@@ -16,6 +17,7 @@ func (interactor *PostInteractor) Index(page int) (model.Posts, error) {
 	for _, post := range posts {
 		postCategory, err := interactor.PostCategoryRepository.FindById(post.PostCategoryId)
 		if err != nil {
+			log.Printf("%s", err.Error())
 			continue
 		}
 		post.PostCategory = postCategory
@@ -27,6 +29,7 @@ func (interactor *PostInteractor) Index(page int) (model.Posts, error) {
 func (interactor *PostInteractor) FindById(id int) (model.Post, error) {
 	post, err := interactor.PostRepository.FindById(id)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return post, err
 	}
 	post.PublishedAt = strings.Split(post.PublishedAt, "T")[0]
@@ -37,6 +40,7 @@ func (interactor *PostInteractor) FindById(id int) (model.Post, error) {
 func (interactor *PostInteractor) GetPostsCount() (int, error) {
 	count, err := interactor.PostRepository.GetPostsCount()
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return count, err
 	}
 	return count, err

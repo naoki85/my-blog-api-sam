@@ -1,4 +1,4 @@
-package database
+package repository
 
 import (
 	"gopkg.in/DATA-DOG/go-sqlmock.v2"

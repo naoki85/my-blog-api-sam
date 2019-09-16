@@ -3,13 +3,13 @@ package controller
 import (
 	"encoding/json"
 	"github.com/naoki85/my-blog-api-sam/config"
-	"github.com/naoki85/my-blog-api-sam/interface/database"
 	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/repository"
 	"testing"
 )
 
 func TestShouldFindAllRecommendedBooks(t *testing.T) {
-	mockSqlHandler, _ := database.NewMockSqlHandler()
+	mockSqlHandler, _ := repository.NewMockSqlHandler()
 	mockSqlHandler.ResistMock("^SELECT (.+) FROM recommended_books .*", []string{"id", "link", "image_url", "button_url"})
 	controller := NewRecommendedBookController(mockSqlHandler)
 	recommendedBooks, status := controller.Index()

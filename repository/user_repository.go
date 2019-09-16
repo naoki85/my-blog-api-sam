@@ -1,6 +1,9 @@
-package database
+package repository
 
-import "time"
+import (
+	"log"
+	"time"
+)
 
 type UserRepository struct {
 	SqlHandler
@@ -16,6 +19,7 @@ func (repo *UserRepository) Create(params UserCreateParams) (bool, error) {
 	now := time.Now().Format("2006-01-02 03-04-05")
 	_, err := repo.SqlHandler.Execute(query, params.Email, params.Password, now, now)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return false, err
 	}
 

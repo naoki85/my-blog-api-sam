@@ -3,14 +3,14 @@ package controller
 import (
 	"encoding/json"
 	"github.com/naoki85/my-blog-api-sam/config"
-	"github.com/naoki85/my-blog-api-sam/interface/database"
 	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/repository"
 	"testing"
 )
 
 func TestShouldGetPostsForIndex(t *testing.T) {
 	// TODO: 複数クエリをモックにするならもはや DB 用意した方が良さそう
-	mockSqlHandler, _ := database.NewMockSqlHandler()
+	mockSqlHandler, _ := repository.NewMockSqlHandler()
 	mockSqlHandler.ResistMockForPostsIndex("^SELECT (.+) FROM posts .*", []string{"id", "post_category_id", "title", "image_file_name", "published_at"})
 	mockSqlHandler.ResistMockForPostCategory("^SELECT (.+) FROM post_categories (.+)", []string{"id", "name", "color"})
 	mockSqlHandler.ResistMockForPostCount("^SELECT COUNT(.+) FROM posts .*", []string{"count"})
@@ -33,7 +33,7 @@ func TestShouldGetPostsForIndex(t *testing.T) {
 }
 
 func TestShouldGetPostsForShow(t *testing.T) {
-	mockSqlHandler, _ := database.NewMockSqlHandler()
+	mockSqlHandler, _ := repository.NewMockSqlHandler()
 	mockSqlHandler.ResistMockForPost("^SELECT (.+) FROM posts .*", []string{"id", "post_category_id", "title", "content", "image_file_name", "published_at"})
 	controller := NewPostController(mockSqlHandler)
 	post, status := controller.Show(1)
