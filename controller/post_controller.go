@@ -3,8 +3,8 @@ package controller
 import (
 	"encoding/json"
 	"github.com/naoki85/my-blog-api-sam/config"
-	"github.com/naoki85/my-blog-api-sam/interface/database"
 	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/repository"
 	"github.com/naoki85/my-blog-api-sam/usecase"
 	"strings"
 )
@@ -13,13 +13,13 @@ type PostController struct {
 	Interactor usecase.PostInteractor
 }
 
-func NewPostController(sqlHandler database.SqlHandler) *PostController {
+func NewPostController(sqlHandler repository.SqlHandler) *PostController {
 	return &PostController{
 		Interactor: usecase.PostInteractor{
-			PostRepository: &database.PostRepository{
+			PostRepository: &repository.PostRepository{
 				SqlHandler: sqlHandler,
 			},
-			PostCategoryRepository: &database.PostCategoryRepository{
+			PostCategoryRepository: &repository.PostCategoryRepository{
 				SqlHandler: sqlHandler,
 			},
 		},

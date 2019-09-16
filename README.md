@@ -76,8 +76,8 @@ And, execute all tests.
 ```shell
 export TEST_FLAG=1
 go test ./infrastructure -v -cover
-go test ./interface/database -v -cover
+go test ./repository -v -cover
 go test ./usecase -v -cover
-go test ./interface/controller -v -cover
+go test ./controller -v -cover
 go test ./handler -v -cover
 ```

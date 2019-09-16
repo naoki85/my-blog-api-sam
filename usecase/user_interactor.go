@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"fmt"
-	"github.com/naoki85/my-blog-api-sam/interface/database"
+	"github.com/naoki85/my-blog-api-sam/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -22,7 +22,7 @@ func (interactor *UserInteractor) Create(params UserInteractorCreateParams) (boo
 	if err != nil {
 		return false, err
 	}
-	var userCreateParams = database.UserCreateParams{
+	var userCreateParams = repository.UserCreateParams{
 		Email:    params.Email,
 		Password: fmt.Sprintf("%s", encryptedPassword),
 	}

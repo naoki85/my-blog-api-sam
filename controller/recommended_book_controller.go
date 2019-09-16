@@ -3,8 +3,8 @@ package controller
 import (
 	"encoding/json"
 	"github.com/naoki85/my-blog-api-sam/config"
-	"github.com/naoki85/my-blog-api-sam/interface/database"
 	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/repository"
 	"github.com/naoki85/my-blog-api-sam/usecase"
 )
 
@@ -12,10 +12,10 @@ type RecommendedBookController struct {
 	Interactor usecase.RecommendedBookInteractor
 }
 
-func NewRecommendedBookController(sqlHandler database.SqlHandler) *RecommendedBookController {
+func NewRecommendedBookController(sqlHandler repository.SqlHandler) *RecommendedBookController {
 	return &RecommendedBookController{
 		Interactor: usecase.RecommendedBookInteractor{
-			RecommendedBookRepository: &database.RecommendedBookRepository{
+			RecommendedBookRepository: &repository.RecommendedBookRepository{
 				SqlHandler: sqlHandler,
 			},
 		},

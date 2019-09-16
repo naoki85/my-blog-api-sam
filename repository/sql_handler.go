@@ -1,4 +1,4 @@
-package database
+package repository
 
 type SqlHandler interface {
 	Execute(string, ...interface{}) (Result, error)

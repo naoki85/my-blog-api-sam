@@ -3,7 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"github.com/naoki85/my-blog-api-sam/config"
-	"github.com/naoki85/my-blog-api-sam/interface/database"
+	"github.com/naoki85/my-blog-api-sam/repository"
 	"github.com/naoki85/my-blog-api-sam/usecase"
 )
 
@@ -11,10 +11,10 @@ type UserController struct {
 	Interactor usecase.UserInteractor
 }
 
-func NewUserController(sqlHandler database.SqlHandler) *UserController {
+func NewUserController(sqlHandler repository.SqlHandler) *UserController {
 	return &UserController{
 		Interactor: usecase.UserInteractor{
-			UserRepository: &database.UserRepository{
+			UserRepository: &repository.UserRepository{
 				SqlHandler: sqlHandler,
 			},
 		},
