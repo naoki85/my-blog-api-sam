@@ -17,7 +17,6 @@ var instance *Config
 var once sync.Once
 
 func InitDbConf(env string) {
-	// hogehoge
 	once.Do(func() {
 		testFlag := os.Getenv("TEST_FLAG")
 		if testFlag != "" {
