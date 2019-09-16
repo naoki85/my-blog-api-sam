@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/naoki85/my-blog-api-sam/model"
+	"log"
 )
 
 type RecommendedBookRepository struct {
@@ -13,6 +14,7 @@ func (repo *RecommendedBookRepository) All(limit int) (recommendedBooks model.Re
 	query = query + " ORDER BY id DESC LIMIT ?"
 	rows, err := repo.SqlHandler.Query(query, limit)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return recommendedBooks, err
 	}
 	defer rows.Close()
@@ -20,6 +22,7 @@ func (repo *RecommendedBookRepository) All(limit int) (recommendedBooks model.Re
 	for rows.Next() {
 		r := model.RecommendedBook{}
 		if err := rows.Scan(&r.Id, &r.Link, &r.ImageUrl, &r.ButtonUrl); err != nil {
+			log.Printf("%s", err.Error())
 			return recommendedBooks, err
 		}
 

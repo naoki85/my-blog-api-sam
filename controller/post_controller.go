@@ -6,6 +6,7 @@ import (
 	"github.com/naoki85/my-blog-api-sam/model"
 	"github.com/naoki85/my-blog-api-sam/repository"
 	"github.com/naoki85/my-blog-api-sam/usecase"
+	"log"
 	"strings"
 )
 
@@ -29,6 +30,7 @@ func NewPostController(sqlHandler repository.SqlHandler) *PostController {
 func (controller *PostController) Index(page int) ([]byte, int) {
 	posts, err := controller.Interactor.Index(page)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return []byte{}, config.NotFoundStatus
 	}
 
@@ -51,6 +53,7 @@ func (controller *PostController) Index(page int) ([]byte, int) {
 
 	count, err := controller.Interactor.GetPostsCount()
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return []byte{}, config.InternalServerErrorStatus
 	}
 
@@ -66,6 +69,7 @@ func (controller *PostController) Index(page int) ([]byte, int) {
 	}{totalPage, retPosts}
 	resp, err := json.Marshal(data)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return resp, config.InternalServerErrorStatus
 	}
 
@@ -75,10 +79,12 @@ func (controller *PostController) Index(page int) ([]byte, int) {
 func (controller *PostController) Show(id int) ([]byte, int) {
 	post, err := controller.Interactor.FindById(id)
 	if err != nil || post.Id == 0 {
+		log.Printf("%s", err.Error())
 		return []byte{}, config.NotFoundStatus
 	}
 	resp, err := json.Marshal(post)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return resp, config.InternalServerErrorStatus
 	}
 

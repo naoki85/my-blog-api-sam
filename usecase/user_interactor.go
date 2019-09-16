@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/naoki85/my-blog-api-sam/repository"
 	"golang.org/x/crypto/bcrypt"
+	"log"
 )
 
 type UserInteractor struct {
@@ -20,6 +21,7 @@ func (interactor *UserInteractor) Create(params UserInteractorCreateParams) (boo
 	var err error
 	encryptedPassword, err = bcrypt.GenerateFromPassword([]byte(params.Password), bcrypt.DefaultCost)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return false, err
 	}
 	var userCreateParams = repository.UserCreateParams{

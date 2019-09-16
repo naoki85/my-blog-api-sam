@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/naoki85/my-blog-api-sam/model"
+	"log"
 	"time"
 )
 
@@ -18,6 +19,7 @@ func (repo *PostRepository) Index(page int) (posts model.Posts, err error) {
 	defer rows.Close()
 
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return posts, err
 	}
 
@@ -25,6 +27,7 @@ func (repo *PostRepository) Index(page int) (posts model.Posts, err error) {
 		p := model.Post{}
 		err := rows.Scan(&p.Id, &p.PostCategoryId, &p.Title, &p.ImageUrl, &p.PublishedAt)
 		if err != nil {
+			log.Printf("%s", err.Error())
 			return posts, err
 		}
 
@@ -38,12 +41,14 @@ func (repo *PostRepository) FindById(id int) (post model.Post, err error) {
 	query := "SELECT id, post_category_id, title, content, image_file_name, published_at FROM posts WHERE id = ? AND active = 1 AND published_at <= ? LIMIT 1"
 	rows, err := repo.SqlHandler.Query(query, id, nowTime)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return post, err
 	}
 
 	for rows.Next() {
 		err := rows.Scan(&post.Id, &post.PostCategoryId, &post.Title, &post.Content, &post.ImageUrl, &post.PublishedAt)
 		if err != nil {
+			log.Printf("%s", err.Error())
 			return post, err
 		}
 		break
@@ -56,11 +61,13 @@ func (repo *PostRepository) GetPostsCount() (count int, err error) {
 	query := "SELECT COUNT(*) FROM posts WHERE active = 1 AND published_at <= ? LIMIT 1"
 	rows, err := repo.SqlHandler.Query(query, nowTime)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return 0, err
 	}
 	for rows.Next() {
 		err := rows.Scan(&count)
 		if err != nil {
+			log.Printf("%s", err.Error())
 			return 0, err
 		}
 		break

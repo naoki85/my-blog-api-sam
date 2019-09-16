@@ -5,6 +5,7 @@ import (
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/repository"
 	"github.com/naoki85/my-blog-api-sam/usecase"
+	"log"
 )
 
 type UserController struct {
@@ -24,6 +25,7 @@ func NewUserController(sqlHandler repository.SqlHandler) *UserController {
 func (controller *UserController) Create(params usecase.UserInteractorCreateParams) ([]byte, int) {
 	res, err := controller.Interactor.Create(params)
 	if err != nil || res == false {
+		log.Printf("%s", err.Error())
 		return []byte{}, config.NotFoundStatus
 	}
 
@@ -32,6 +34,7 @@ func (controller *UserController) Create(params usecase.UserInteractorCreatePara
 	}{"success"}
 	resp, err := json.Marshal(data)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return resp, config.InternalServerErrorStatus
 	}
 	return resp, config.SuccessStatus

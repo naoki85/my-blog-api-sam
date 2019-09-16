@@ -6,6 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/repository"
+	"log"
 )
 
 type SqlHandler struct {
@@ -17,6 +18,7 @@ func NewSqlHandler(c *config.Config) (repository.SqlHandler, error) {
 		c.Username, c.Password, c.Host, c.Port, c.Database)
 	conn, err := sql.Open("mysql", dsn)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		panic(err.Error)
 	}
 	sqlHandler := new(SqlHandler)
@@ -28,6 +30,7 @@ func (handler *SqlHandler) Execute(statement string, args ...interface{}) (repos
 	res := SqlResult{}
 	result, err := handler.Conn.Exec(statement, args...)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return res, err
 	}
 	res.Result = result
@@ -37,6 +40,7 @@ func (handler *SqlHandler) Execute(statement string, args ...interface{}) (repos
 func (handler *SqlHandler) Query(statement string, args ...interface{}) (repository.Row, error) {
 	rows, err := handler.Conn.Query(statement, args...)
 	if err != nil {
+		log.Printf("%s", err.Error())
 		return new(SqlRow), err
 	}
 	row := new(SqlRow)
