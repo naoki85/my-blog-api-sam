@@ -1,10 +1,7 @@
 package usecase
 
-type UserCreateParams struct {
-	email    string
-	password string
-}
+import "github.com/naoki85/my-blog-api-sam/interface/database"
 
 type UserRepository interface {
-	Create(UserCreateParams) (bool, error)
+	Create(params database.UserCreateParams) (bool, error)
 }

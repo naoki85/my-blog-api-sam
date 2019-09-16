@@ -1,13 +1,14 @@
 package usecase
 
 import (
+	"github.com/naoki85/my-blog-api-sam/interface/database"
 	"testing"
 )
 
 type MockUserRepository struct {
 }
 
-func (repo *MockUserRepository) Create(params UserCreateParams) (bool, error) {
+func (repo *MockUserRepository) Create(params database.UserCreateParams) (bool, error) {
 	return true, nil
 }
 
@@ -18,8 +19,8 @@ func TestShouldCreateNewUser(t *testing.T) {
 	}
 
 	params := UserInteractorCreateParams{
-		email:    "test@example.com",
-		password: "hogehoge",
+		Email:    "test@example.com",
+		Password: "hogehoge",
 	}
 
 	_, err := interactor.Create(params)

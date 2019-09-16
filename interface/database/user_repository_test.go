@@ -14,8 +14,8 @@ func TestShouldCreateUser(t *testing.T) {
 		SqlHandler: mockSqlHandler,
 	}
 	params := UserCreateParams{
-		email:    "test@example.com",
-		password: "password",
+		Email:    "test@example.com",
+		Password: "password",
 	}
 	_, err := repo.Create(params)
 	if err != nil {

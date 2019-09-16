@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"fmt"
+	"github.com/naoki85/my-blog-api-sam/interface/database"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -10,20 +11,20 @@ type UserInteractor struct {
 }
 
 type UserInteractorCreateParams struct {
-	email    string
-	password string
+	Email    string
+	Password string
 }
 
 func (interactor *UserInteractor) Create(params UserInteractorCreateParams) (bool, error) {
 	var encryptedPassword []byte
 	var err error
-	encryptedPassword, err = bcrypt.GenerateFromPassword([]byte(params.password), bcrypt.DefaultCost)
+	encryptedPassword, err = bcrypt.GenerateFromPassword([]byte(params.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return false, err
 	}
-	var userCreateParams = UserCreateParams{
-		email:    params.email,
-		password: fmt.Sprintf("%s", encryptedPassword),
+	var userCreateParams = database.UserCreateParams{
+		Email:    params.Email,
+		Password: fmt.Sprintf("%s", encryptedPassword),
 	}
 	return interactor.UserRepository.Create(userCreateParams)
 }
