@@ -8,7 +8,6 @@ import (
 func TestShouldCreateUser(t *testing.T) {
 	mockSqlHandler, _ := NewMockSqlHandler()
 	mockSqlHandler.Mock.ExpectExec("INSERT INTO users").
-		WithArgs("test@example.com", "password").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	repo := UserRepository{
 		SqlHandler: mockSqlHandler,

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/naoki85/my-blog-api-sam/config"
+	"github.com/naoki85/my-blog-api-sam/infrastructure"
 	"testing"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -30,11 +31,38 @@ func TestHandler(t *testing.T) {
 	})
 }
 
+func TestCreateUserHandler(t *testing.T) {
+	t.Run("Successful Request", func(t *testing.T) {
+		res, _ := createUser(events.APIGatewayProxyRequest{
+			Body: `{"email":"hoge@example.com","password":"hogehoge"}`,
+		})
+		if res.StatusCode != config.SuccessStatus {
+			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
+		}
+	})
+}
+
 func TestHealthHandler(t *testing.T) {
+	_, teardown := SetupTest()
+	defer teardown()
+
 	t.Run("Successful Request", func(t *testing.T) {
 		res, _ := health(events.APIGatewayProxyRequest{})
 		if res.StatusCode != config.SuccessStatus {
 			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
 		}
 	})
+}
+
+func SetupTest() (bool, func()) {
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	sqlHandler, err := infrastructure.NewSqlHandler(c)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return true, func() {
+		_, _ = sqlHandler.Execute("DELETE FROM users")
+	}
 }

@@ -28,7 +28,7 @@ func (controller *UserController) Create(params usecase.UserInteractorCreatePara
 	}
 
 	data := struct {
-		message string
+		Message string
 	}{"success"}
 	resp, err := json.Marshal(data)
 	if err != nil {
