@@ -25,6 +25,8 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return post(request)
 	} else if request.HTTPMethod == "POST" && request.Path == "/users" {
 		return createUser(request)
+	} else if request.HTTPMethod == "POST" && request.Path == "/login" {
+		return login(request)
 	}
 	return handleError(404), nil
 }
@@ -97,6 +99,25 @@ func createUser(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRe
 	controller := controller.NewUserController(sqlHandler)
 
 	res, status := controller.Create(params)
+	if status != config.SuccessStatus {
+		return handleError(status), nil
+	}
+	return apiResponse(fmt.Sprintf("%s", res), status), nil
+}
+
+func login(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	var params usecase.UserInteractorCreateParams
+	requestBody := []byte(request.Body)
+	err := json.Unmarshal(requestBody, &params)
+	if err != nil {
+		return handleError(400), nil
+	}
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	sqlHandler, _ := infrastructure.NewSqlHandler(c)
+	controller := controller.NewUserController(sqlHandler)
+
+	res, status := controller.Login(params)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
