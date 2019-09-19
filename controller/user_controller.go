@@ -2,10 +2,12 @@ package controller
 
 import (
 	"encoding/json"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/repository"
 	"github.com/naoki85/my-blog-api-sam/usecase"
 	"log"
+	"os"
 )
 
 type UserController struct {
@@ -23,8 +25,8 @@ func NewUserController(sqlHandler repository.SqlHandler) *UserController {
 }
 
 func (controller *UserController) Create(params usecase.UserInteractorCreateParams) ([]byte, int) {
-	res, err := controller.Interactor.Create(params)
-	if err != nil || res == false {
+	_, err := controller.Interactor.Create(params)
+	if err != nil {
 		log.Printf("%s", err.Error())
 		return []byte{}, config.NotFoundStatus
 	}
@@ -47,13 +49,26 @@ func (controller *UserController) Login(params usecase.UserInteractorCreateParam
 		return []byte{}, config.InvalidParameterStatus
 	}
 
-	data := struct {
-		AuthenticationToken string
-	}{user.AuthenticationToken}
-	resp, err := json.Marshal(data)
+	resp, err := generateJwtToken(user.AuthenticationToken)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return resp, config.InternalServerErrorStatus
 	}
 	return resp, config.SuccessStatus
+}
+
+func generateJwtToken(base string) ([]byte, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["accessToken"] = base
+	tokenString, err := token.SignedString(signingKey())
+	return []byte(tokenString), err
+}
+
+func signingKey() []byte {
+	if len(os.Getenv("SIGNINGKEY")) == 0 {
+		return []byte("hogehoge")
+	} else {
+		return []byte(os.Getenv("SIGNINGKEY"))
+	}
 }

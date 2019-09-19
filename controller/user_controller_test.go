@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"encoding/json"
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/infrastructure"
 	"github.com/naoki85/my-blog-api-sam/repository"
@@ -31,9 +30,6 @@ func TestShouldUserLogin(t *testing.T) {
 	sqlHandler, tearDown := SetupTest()
 	defer tearDown()
 	controller := NewUserController(sqlHandler)
-	var result struct {
-		AuthenticationToken string
-	}
 	params := usecase.UserInteractorCreateParams{
 		Email:    "test@example.com",
 		Password: "password",
@@ -49,16 +45,9 @@ func TestShouldUserLogin(t *testing.T) {
 			Password: "password",
 		}
 
-		res, status := controller.Login(successfulParams)
+		_, status := controller.Login(successfulParams)
 		if status != config.SuccessStatus {
 			t.Fatalf("Should get 200 status, but got: %d", status)
-		}
-		err := json.Unmarshal(res, &result)
-		if err != nil {
-			t.Fatalf("Response could not pasred: %s", err.Error())
-		}
-		if result.AuthenticationToken == "" {
-			t.Fatal("Could not get AuthenticationToken")
 		}
 	})
 
