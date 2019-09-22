@@ -52,6 +52,16 @@ Resources:
           Properties:
             Path: /users
             Method: POST
+        UsersLoginApi:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: POST
+        UsersLogoutApi:
+          Type: Api
+          Properties:
+            Path: /logout
+            Method: DELETE
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           USERNAME: username
