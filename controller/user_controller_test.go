@@ -78,5 +78,6 @@ func SetupTest() (repository.SqlHandler, func()) {
 
 	return sqlHandler, func() {
 		_, _ = sqlHandler.Execute("DELETE FROM users")
+		_, _ = sqlHandler.Execute("DELETE FROM recommended_books")
 	}
 }

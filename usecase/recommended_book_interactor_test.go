@@ -1,33 +1,50 @@
 package usecase
 
 import (
-	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/repository"
 	"testing"
 )
 
-type MockRecommendedBookRepository struct {
-}
-
-func (repo *MockRecommendedBookRepository) All(int) (model.RecommendedBooks, error) {
-	recommendedBooks := model.RecommendedBooks{
-		model.RecommendedBook{Id: 1},
-		model.RecommendedBook{Id: 2},
-		model.RecommendedBook{Id: 3},
-		model.RecommendedBook{Id: 4},
-	}
-	return recommendedBooks, nil
-}
-
 func TestShouldFindAllRecommendedBooks(t *testing.T) {
-	repo := new(MockRecommendedBookRepository)
+	sqlHandler, tearDown := SetupTest()
+	defer tearDown()
 	interactor := RecommendedBookInteractor{
-		RecommendedBookRepository: repo,
+		RecommendedBookRepository: &repository.RecommendedBookRepository{
+			sqlHandler,
+		},
 	}
-	_, err := interactor.RecommendedBookRepository.All(4)
+
+	_, _ = sqlHandler.Execute("INSERT INTO `recommended_books` VALUES (1,6,'http://test.example.com/hoge','http://test.example.com/hoge.png','http://test.example.com/hoge.png',0,'2018-12-30 17:00:14','2018-12-30 17:00:25')")
+	_, _ = sqlHandler.Execute("INSERT INTO `recommended_books` VALUES (2,6,'http://test.example.com/hoge','http://test.example.com/hoge.png','http://test.example.com/hoge.png',0,'2018-12-30 17:00:14','2018-12-30 17:00:25')")
+	_, _ = sqlHandler.Execute("INSERT INTO `recommended_books` VALUES (3,6,'http://test.example.com/hoge','http://test.example.com/hoge.png','http://test.example.com/hoge.png',0,'2018-12-30 17:00:14','2018-12-30 17:00:25')")
+	_, _ = sqlHandler.Execute("INSERT INTO `recommended_books` VALUES (4,6,'http://test.example.com/hoge','http://test.example.com/hoge.png','http://test.example.com/hoge.png',0,'2018-12-30 17:00:14','2018-12-30 17:00:25')")
+
+	recommendedBooks, err := interactor.RecommendedBookRepository.All(4)
 	if err != nil {
 		t.Fatalf("Cannot get recommended_books: %s", err)
 	}
-	//if len(recommendedBooks) != 4 {
-	//	t.Fatalf("Fail expected: 4, got: %v", len(recommendedBooks))
-	//}
+	if len(recommendedBooks) != 4 {
+		t.Fatalf("Fail expected: 4, got: %v", len(recommendedBooks))
+	}
+}
+
+func TestShouldCreateRecommendedBook(t *testing.T) {
+	sqlHandler, tearDown := SetupTest()
+	defer tearDown()
+	interactor := RecommendedBookInteractor{
+		RecommendedBookRepository: &repository.RecommendedBookRepository{
+			sqlHandler,
+		},
+	}
+
+	params := RecommendedBookInteractorCreateParams{
+		Link:      "http://test.example.com/hoge",
+		ImageUrl:  "http://test.example.com/hoge.png",
+		ButtonUrl: "http://test.example.com/hoge.png",
+	}
+
+	err := interactor.Create(params)
+	if err != nil {
+		t.Fatalf("Could not create recommended book: %s", err.Error())
+	}
 }

@@ -32,6 +32,19 @@ func TestHandler(t *testing.T) {
 	})
 }
 
+func TestCreateRecommendedBookHandler(t *testing.T) {
+	t.Run("Successful Request", func(t *testing.T) {
+		res, _ := createRecommendedBook(events.APIGatewayProxyRequest{
+			HTTPMethod: "POST",
+			Path:       "/recommended_books",
+			Body:       `{"link":"http://test.example.com","image_url":"http://test.example.com","button_url":"http://test.example.com"}`,
+		})
+		if res.StatusCode != config.SuccessStatus {
+			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
+		}
+	})
+}
+
 func TestCreateUserHandler(t *testing.T) {
 	t.Run("Successful Request", func(t *testing.T) {
 		res, _ := createUser(events.APIGatewayProxyRequest{

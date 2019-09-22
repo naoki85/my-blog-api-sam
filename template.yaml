@@ -37,6 +37,11 @@ Resources:
           Properties:
             Path: /recommended_books
             Method: GET
+        RecommendedBooksCreateApi:
+          Type: Api
+          Properties:
+            Path: /recommended_books
+            Method: POST
         PostsIndexApi:
           Type: Api
           Properties:

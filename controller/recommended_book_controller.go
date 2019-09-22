@@ -41,3 +41,21 @@ func (controller *RecommendedBookController) Index() ([]byte, int) {
 	}
 	return resp, config.SuccessStatus
 }
+
+func (controller *RecommendedBookController) Create(params usecase.RecommendedBookInteractorCreateParams) ([]byte, int) {
+	err := controller.Interactor.Create(params)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return []byte{}, config.InvalidParameterStatus
+	}
+
+	data := struct {
+		Message string
+	}{"success"}
+	resp, err := json.Marshal(data)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return resp, config.InternalServerErrorStatus
+	}
+	return resp, config.SuccessStatus
+}
