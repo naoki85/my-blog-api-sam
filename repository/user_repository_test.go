@@ -13,7 +13,7 @@ func TestShouldFindUserByEmail(t *testing.T) {
 	repo := UserRepository{
 		SqlHandler: mockSqlHandler,
 	}
-	user, err := repo.FindByEmail("hoge@example.com")
+	user, err := repo.FindBy("email", "hoge@example.com")
 	if err != nil {
 		t.Fatalf("Could not find user: %s", err.Error())
 	}

@@ -6,7 +6,7 @@ import (
 )
 
 type UserRepository interface {
-	FindByEmail(string) (model.User, error)
+	FindBy(string, string) (model.User, error)
 	UpdateAttribute(int, string, string) (bool, error)
 	Create(repository.UserCreateParams) (bool, error)
 }

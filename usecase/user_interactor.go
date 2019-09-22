@@ -45,7 +45,7 @@ func (interactor *UserInteractor) Create(params UserInteractorCreateParams) (boo
 }
 
 func (interactor *UserInteractor) Login(params UserInteractorCreateParams) (model.User, error) {
-	user, err := interactor.UserRepository.FindByEmail(params.Email)
+	user, err := interactor.UserRepository.FindBy("email", params.Email)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return user, err
@@ -62,6 +62,19 @@ func (interactor *UserInteractor) Login(params UserInteractorCreateParams) (mode
 	}
 
 	return user, err
+}
+
+func (interactor *UserInteractor) Logout(authenticationToken string) error {
+	user, err := interactor.UserRepository.FindBy("authentication_token", authenticationToken)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return err
+	}
+	_, err = interactor.UserRepository.UpdateAttribute(user.Id, "authentication_token", "")
+	if err != nil {
+		log.Printf("%s", err.Error())
+	}
+	return err
 }
 
 func (interactor *UserInteractor) updateToken(user *model.User) error {

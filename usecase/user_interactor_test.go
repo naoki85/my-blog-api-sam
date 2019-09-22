@@ -34,6 +34,38 @@ func TestShouldCreateUserAndLogin(t *testing.T) {
 	}
 }
 
+func TestShouldUserLogout(t *testing.T) {
+	sqlHandler, tearDown := SetupTest()
+	defer tearDown()
+	interactor := UserInteractor{
+		UserRepository: &repository.UserRepository{
+			sqlHandler,
+		},
+	}
+
+	params := UserInteractorCreateParams{
+		Email:    "test@example.com",
+		Password: "hogehoge",
+	}
+
+	_, err := interactor.Create(params)
+	if err != nil {
+		t.Fatalf("Could not create user: %s", err.Error())
+	}
+	user, err := interactor.Login(params)
+	if err != nil {
+		t.Fatalf("Could not login: %s", err.Error())
+	}
+	if user.AuthenticationToken == "" {
+		t.Fatal("Should set authorization_token to user")
+	}
+
+	err = interactor.Logout(user.AuthenticationToken)
+	if err != nil {
+		t.Fatalf("Could not logout: %s", err.Error())
+	}
+}
+
 func SetupTest() (repository.SqlHandler, func()) {
 	config.InitDbConf("")
 	c := config.GetDbConf()

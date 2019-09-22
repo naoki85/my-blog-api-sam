@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/repository"
@@ -50,6 +51,31 @@ func (controller *UserController) Login(params usecase.UserInteractorCreateParam
 	}
 
 	resp, err := generateJwtToken(user.AuthenticationToken)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return resp, config.InternalServerErrorStatus
+	}
+	return resp, config.SuccessStatus
+}
+
+func (controller *UserController) Logout(params string) ([]byte, int) {
+	token, err := jwt.Parse(params, func(token *jwt.Token) (interface{}, error) {
+		return signingKey(), nil
+	})
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return []byte{}, config.InvalidParameterStatus
+	}
+
+	err = controller.Interactor.Logout(fmt.Sprintf("%s", token.Claims.(jwt.MapClaims)["accessToken"]))
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return []byte{}, config.InternalServerErrorStatus
+	}
+	data := struct {
+		Message string
+	}{"success"}
+	resp, err := json.Marshal(data)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return resp, config.InternalServerErrorStatus

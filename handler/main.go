@@ -9,6 +9,7 @@ import (
 	"github.com/naoki85/my-blog-api-sam/usecase"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -27,6 +28,8 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return createUser(request)
 	} else if request.HTTPMethod == "POST" && request.Path == "/login" {
 		return login(request)
+	} else if request.HTTPMethod == "DELETE" && request.Path == "/logout" {
+		return logout(request)
 	}
 	return handleError(404), nil
 }
@@ -118,6 +121,21 @@ func login(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 	controller := controller.NewUserController(sqlHandler)
 
 	res, status := controller.Login(params)
+	if status != config.SuccessStatus {
+		return handleError(status), nil
+	}
+	return apiResponse(fmt.Sprintf("%s", res), status), nil
+}
+
+func logout(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	header := request.Headers["Authorization"]
+	authenticationToken := strings.Split(header, " ")[1]
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	sqlHandler, _ := infrastructure.NewSqlHandler(c)
+	controller := controller.NewUserController(sqlHandler)
+
+	res, status := controller.Logout(authenticationToken)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}

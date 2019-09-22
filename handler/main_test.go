@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/infrastructure"
 	"testing"
@@ -44,7 +45,7 @@ func TestCreateUserHandler(t *testing.T) {
 	})
 }
 
-func TestLoginHandler(t *testing.T) {
+func TestLoginAndLogoutHandler(t *testing.T) {
 	_, teardown := SetupTest()
 	defer teardown()
 	_, _ = createUser(events.APIGatewayProxyRequest{
@@ -58,6 +59,15 @@ func TestLoginHandler(t *testing.T) {
 			Body:       `{"email":"hoge@example.com","password":"hogehoge"}`,
 		})
 		if res.StatusCode != config.SuccessStatus {
+			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
+		}
+
+		logoutResult, _ := logout(events.APIGatewayProxyRequest{
+			HTTPMethod: "DELETE",
+			Path:       "/logout",
+			Headers:    map[string]string{"Authorization": fmt.Sprintf("Bearer %s", res.Body)},
+		})
+		if logoutResult.StatusCode != config.SuccessStatus {
 			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
 		}
 	})

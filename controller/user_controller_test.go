@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/infrastructure"
 	"github.com/naoki85/my-blog-api-sam/repository"
@@ -26,7 +27,7 @@ func TestShouldCreateUser(t *testing.T) {
 	}
 }
 
-func TestShouldUserLogin(t *testing.T) {
+func TestShouldUserLoginAndLogout(t *testing.T) {
 	sqlHandler, tearDown := SetupTest()
 	defer tearDown()
 	controller := NewUserController(sqlHandler)
@@ -45,7 +46,11 @@ func TestShouldUserLogin(t *testing.T) {
 			Password: "password",
 		}
 
-		_, status := controller.Login(successfulParams)
+		token, status := controller.Login(successfulParams)
+		if status != config.SuccessStatus {
+			t.Fatalf("Should get 200 status, but got: %d", status)
+		}
+		_, status = controller.Logout(fmt.Sprintf("%s", token))
 		if status != config.SuccessStatus {
 			t.Fatalf("Should get 200 status, but got: %d", status)
 		}
