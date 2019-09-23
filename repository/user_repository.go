@@ -36,6 +36,27 @@ func (repo *UserRepository) FindBy(key string, value string) (user model.User, e
 	return user, err
 }
 
+func (repo *UserRepository) FindByAuthenticationToken(value string) (user model.User, err error) {
+	query := "SELECT id FROM users WHERE authentication_token = ? AND authentication_token_expired_at <= ? LIMIT 1"
+	now := time.Now().Format("2006-01-02 03-04-05")
+	rows, err := repo.SqlHandler.Query(query, value, now)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return user, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&user.Id)
+		if err != nil {
+			log.Printf("%s", err.Error())
+			return user, err
+		}
+		break
+	}
+	return user, err
+}
+
 func (repo *UserRepository) UpdateAttribute(id int, field string, param string) (bool, error) {
 	query := fmt.Sprintf("UPDATE users SET %s = ?, updated_at = ? WHERE id = ? LIMIT 1", field)
 	now := time.Now().Format("2006-01-02 03-04-05")

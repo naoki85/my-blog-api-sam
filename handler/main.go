@@ -18,10 +18,12 @@ import (
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if request.Path == "/health" {
 		return health(request)
-	} else if request.HTTPMethod == "POST" && request.Path == "/recommended_books" {
-		return createRecommendedBook(request)
 	} else if request.Path == "/recommended_books" {
-		return recommendedBooks(request)
+		if request.HTTPMethod == "POST" {
+			return requireLogin(createRecommendedBook, request)
+		} else {
+			return recommendedBooks(request)
+		}
 	} else if request.Path == "/posts" {
 		return posts(request)
 	} else if regexp.MustCompile(`^/posts/(\d+)`).MatchString(request.Path) {
@@ -38,6 +40,21 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 
 func main() {
 	lambda.Start(handler)
+}
+
+func requireLogin(f func(events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error),
+	request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	header := request.Headers["Authorization"]
+	authenticationToken := strings.Split(header, " ")[1]
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	sqlHandler, _ := infrastructure.NewSqlHandler(c)
+	userController := controller.NewUserController(sqlHandler)
+	_, status := userController.LoginStatus(authenticationToken)
+	if status != config.SuccessStatus {
+		return handleError(config.UnauthorizedStatus), nil
+	}
+	return f(request)
 }
 
 func recommendedBooks(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {

@@ -83,6 +83,31 @@ func (controller *UserController) Logout(params string) ([]byte, int) {
 	return resp, config.SuccessStatus
 }
 
+func (controller *UserController) LoginStatus(params string) ([]byte, int) {
+	token, err := jwt.Parse(params, func(token *jwt.Token) (interface{}, error) {
+		return signingKey(), nil
+	})
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return []byte{}, config.InvalidParameterStatus
+	}
+
+	_, err = controller.Interactor.CheckAuthenticationToken(fmt.Sprintf("%s", token.Claims.(jwt.MapClaims)["accessToken"]))
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return []byte{}, config.NotFoundStatus
+	}
+	data := struct {
+		Message string
+	}{"success"}
+	resp, err := json.Marshal(data)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return resp, config.InternalServerErrorStatus
+	}
+	return resp, config.SuccessStatus
+}
+
 func generateJwtToken(base string) ([]byte, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)

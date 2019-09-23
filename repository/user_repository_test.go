@@ -22,6 +22,22 @@ func TestShouldFindUserByEmail(t *testing.T) {
 	}
 }
 
+func TestShouldFindUserByAuthenticationToken(t *testing.T) {
+	rows := sqlmock.NewRows([]string{"id"}).AddRow(1)
+	mockSqlHandler, _ := NewMockSqlHandler()
+	mockSqlHandler.Mock.ExpectQuery("^SELECT (.+) FROM users .*").WillReturnRows(rows)
+	repo := UserRepository{
+		SqlHandler: mockSqlHandler,
+	}
+	user, err := repo.FindByAuthenticationToken("hoge@example.com")
+	if err != nil {
+		t.Fatalf("Could not find user: %s", err.Error())
+	}
+	if user.Id != 1 {
+		t.Fatalf("Fail expected id: 1, got: %s", user.Email)
+	}
+}
+
 func TestShouldUpdateAttribute(t *testing.T) {
 	mockSqlHandler, _ := NewMockSqlHandler()
 	mockSqlHandler.Mock.ExpectExec("UPDATE users SET").
