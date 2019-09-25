@@ -37,7 +37,7 @@ func (repo *UserRepository) FindBy(key string, value string) (user model.User, e
 }
 
 func (repo *UserRepository) FindByAuthenticationToken(value string) (user model.User, err error) {
-	query := "SELECT id FROM users WHERE authentication_token = ? AND authentication_token_expired_at <= ? LIMIT 1"
+	query := "SELECT id FROM users WHERE authentication_token = ? AND authentication_token_expired_at >= ? LIMIT 1"
 	now := time.Now().Format("2006-01-02 03-04-05")
 	rows, err := repo.SqlHandler.Query(query, value, now)
 	if err != nil {
