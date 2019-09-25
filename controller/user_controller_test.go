@@ -68,6 +68,43 @@ func TestShouldUserLoginAndLogout(t *testing.T) {
 	})
 }
 
+func TestCheckLoginStatus(t *testing.T) {
+	sqlHandler, tearDown := SetupTest()
+	defer tearDown()
+	controller := NewUserController(sqlHandler)
+	params := usecase.UserInteractorCreateParams{
+		Email:    "test@example.com",
+		Password: "password",
+	}
+	_, status := controller.Create(params)
+	if status != config.SuccessStatus {
+		t.Fatalf("Should get 200 status, but got: %d", status)
+	}
+
+	t.Run("Successful Request", func(t *testing.T) {
+		successfulParams := usecase.UserInteractorCreateParams{
+			Email:    "test@example.com",
+			Password: "password",
+		}
+
+		token, status := controller.Login(successfulParams)
+		if status != config.SuccessStatus {
+			t.Fatalf("Should get 200 status, but got: %d", status)
+		}
+		_, status = controller.LoginStatus(fmt.Sprintf("%s", token))
+		if status != config.SuccessStatus {
+			t.Fatalf("Should get 200 status, but got: %d", status)
+		}
+	})
+
+	t.Run("Login Failure", func(t *testing.T) {
+		_, status = controller.LoginStatus("hogehoge")
+		if status != config.InvalidParameterStatus {
+			t.Fatalf("Should get 401 status, but got: %d", status)
+		}
+	})
+}
+
 func SetupTest() (repository.SqlHandler, func()) {
 	config.InitDbConf("")
 	c := config.GetDbConf()
@@ -78,5 +115,6 @@ func SetupTest() (repository.SqlHandler, func()) {
 
 	return sqlHandler, func() {
 		_, _ = sqlHandler.Execute("DELETE FROM users")
+		_, _ = sqlHandler.Execute("DELETE FROM recommended_books")
 	}
 }

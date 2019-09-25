@@ -34,6 +34,49 @@ func TestShouldCreateUserAndLogin(t *testing.T) {
 	}
 }
 
+func TestShouldCheckAuthenticationToken(t *testing.T) {
+	sqlHandler, tearDown := SetupTest()
+	defer tearDown()
+	interactor := UserInteractor{
+		UserRepository: &repository.UserRepository{
+			sqlHandler,
+		},
+	}
+
+	t.Run("find logged in user", func(t *testing.T) {
+		params := UserInteractorCreateParams{
+			Email:    "test@example.com",
+			Password: "hogehoge",
+		}
+
+		_, err := interactor.Create(params)
+		if err != nil {
+			t.Fatalf("Could not create user: %s", err.Error())
+		}
+		user, err := interactor.Login(params)
+		if err != nil {
+			t.Fatalf("Could not login: %s", err.Error())
+		}
+		if user.AuthenticationToken == "" {
+			t.Fatal("Should set authorization_token to user")
+		}
+		user2, err := interactor.CheckAuthenticationToken(user.AuthenticationToken)
+		if err != nil {
+			t.Fatalf("Could not find user: %s", err.Error())
+		}
+		if user2.Id == 0 {
+			t.Fatalf("Could not find user: %d", user2.Id)
+		}
+	})
+
+	t.Run("could not find logged in user", func(t *testing.T) {
+		_, err := interactor.CheckAuthenticationToken("hogehoge")
+		if err == nil {
+			t.Fatal("Wrong result")
+		}
+	})
+}
+
 func TestShouldUserLogout(t *testing.T) {
 	sqlHandler, tearDown := SetupTest()
 	defer tearDown()
@@ -76,5 +119,6 @@ func SetupTest() (repository.SqlHandler, func()) {
 
 	return sqlHandler, func() {
 		_, _ = sqlHandler.Execute("DELETE FROM users")
+		_, _ = sqlHandler.Execute("DELETE FROM recommended_books")
 	}
 }

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/naoki85/my-blog-api-sam/model"
 	"github.com/naoki85/my-blog-api-sam/repository"
@@ -75,6 +76,18 @@ func (interactor *UserInteractor) Logout(authenticationToken string) error {
 		log.Printf("%s", err.Error())
 	}
 	return err
+}
+
+func (interactor *UserInteractor) CheckAuthenticationToken(authenticationToken string) (model.User, error) {
+	user, err := interactor.UserRepository.FindByAuthenticationToken(authenticationToken)
+	if err != nil {
+		log.Printf("%s", err.Error())
+	}
+	if user.Id == 0 {
+		err = errors.New("not found")
+		log.Printf("%s", err.Error())
+	}
+	return user, err
 }
 
 func (interactor *UserInteractor) updateToken(user *model.User) error {

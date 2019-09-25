@@ -19,7 +19,11 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	if request.Path == "/health" {
 		return health(request)
 	} else if request.Path == "/recommended_books" {
-		return recommendedBooks(request)
+		if request.HTTPMethod == "POST" {
+			return requireLogin(createRecommendedBook, request)
+		} else {
+			return recommendedBooks(request)
+		}
 	} else if request.Path == "/posts" {
 		return posts(request)
 	} else if regexp.MustCompile(`^/posts/(\d+)`).MatchString(request.Path) {
@@ -38,12 +42,48 @@ func main() {
 	lambda.Start(handler)
 }
 
+func requireLogin(f func(events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error),
+	request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	header := request.Headers["Authorization"]
+	authenticationToken := strings.Split(header, " ")[1]
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	sqlHandler, _ := infrastructure.NewSqlHandler(c)
+	userController := controller.NewUserController(sqlHandler)
+	_, status := userController.LoginStatus(authenticationToken)
+	if status != config.SuccessStatus {
+		return handleError(config.UnauthorizedStatus), nil
+	}
+	return f(request)
+}
+
 func recommendedBooks(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	controller := controller.NewRecommendedBookController(sqlHandler)
-	recommendedBooks, status := controller.Index()
+	testController := controller.NewRecommendedBookController(sqlHandler)
+	recommendedBooks, status := testController.Index()
+
+	if status != config.SuccessStatus {
+		return handleError(status), nil
+	}
+
+	return apiResponse(fmt.Sprintf("%s", recommendedBooks), status), nil
+}
+
+func createRecommendedBook(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	var params usecase.RecommendedBookInteractorCreateParams
+	requestBody := []byte(request.Body)
+	err := json.Unmarshal(requestBody, &params)
+	if err != nil {
+		return handleError(400), nil
+	}
+
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	sqlHandler, _ := infrastructure.NewSqlHandler(c)
+	testController := controller.NewRecommendedBookController(sqlHandler)
+	recommendedBooks, status := testController.Create(params)
 
 	if status != config.SuccessStatus {
 		return handleError(status), nil
@@ -61,8 +101,8 @@ func posts(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	controller := controller.NewPostController(sqlHandler)
-	resp, status := controller.Index(page)
+	testController := controller.NewPostController(sqlHandler)
+	resp, status := testController.Index(page)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
@@ -79,9 +119,9 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	controller := controller.NewPostController(sqlHandler)
+	testController := controller.NewPostController(sqlHandler)
 
-	post, status := controller.Show(postId)
+	post, status := testController.Show(postId)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
@@ -99,9 +139,9 @@ func createUser(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRe
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	controller := controller.NewUserController(sqlHandler)
+	testController := controller.NewUserController(sqlHandler)
 
-	res, status := controller.Create(params)
+	res, status := testController.Create(params)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
@@ -118,9 +158,9 @@ func login(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	controller := controller.NewUserController(sqlHandler)
+	testController := controller.NewUserController(sqlHandler)
 
-	res, status := controller.Login(params)
+	res, status := testController.Login(params)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
@@ -133,9 +173,9 @@ func logout(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespon
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	controller := controller.NewUserController(sqlHandler)
+	testController := controller.NewUserController(sqlHandler)
 
-	res, status := controller.Logout(authenticationToken)
+	res, status := testController.Logout(authenticationToken)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
