@@ -19,9 +19,9 @@ Globals:
         DBNAME: dbname
   Api:
     Cors:
-      AllowMethods: "OPTIONS,POST,GET"
-      AllowHeaders: "Content-Type,Authorization"
-      AllowOrigin: "*"
+      AllowMethods: "'OPTIONS,POST,GET'"
+      AllowHeaders: "'Content-Type,Authorization'"
+      AllowOrigin: "'*'"
 
 Resources:
   MyBlogApiFunction:
