@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/infrastructure"
+	"github.com/naoki85/my-blog-api-sam/model"
+	"strings"
 	"testing"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -17,17 +20,46 @@ func TestHandler(t *testing.T) {
 		}
 	})
 
-	t.Run("posts/1", func(t *testing.T) {
-		_, err := handler(events.APIGatewayProxyRequest{Path: "/posts/66", PathParameters: map[string]string{"id": "1"}})
-		if err != nil {
-			t.Fatal("Everything should be ok")
-		}
-	})
-
 	t.Run("recommended_books", func(t *testing.T) {
 		_, err := handler(events.APIGatewayProxyRequest{Path: "/recommended_books"})
 		if err != nil {
 			t.Fatal("Everything should be ok")
+		}
+	})
+}
+
+func TestPostHandler(t *testing.T) {
+	t.Run("posts/1", func(t *testing.T) {
+		res, err := handler(events.APIGatewayProxyRequest{
+			Path:           "/posts/1",
+			Headers:        map[string]string{"Content-Type": "application/json"},
+			PathParameters: map[string]string{"id": "1"},
+		})
+		if err != nil {
+			t.Fatal("Everything should be ok")
+		}
+
+		var res2Obj model.Post
+		err = json.Unmarshal([]byte(res.Body), &res2Obj)
+		if err != nil {
+			t.Fatal("Could not parse response")
+		}
+		if res2Obj.Id != 1 {
+			t.Fatalf("id should be 1, but got %d", res2Obj.Id)
+		}
+	})
+
+	t.Run("no content type", func(t *testing.T) {
+		res, err := handler(events.APIGatewayProxyRequest{
+			Path:           "/posts/1",
+			PathParameters: map[string]string{"id": "1"},
+		})
+		if err != nil {
+			t.Fatal("Everything should be ok")
+		}
+
+		if strings.Contains(res.Body, `<!DOCTYPE html>`) == false {
+			t.Fatalf("Not match expected strings: %s", res.Body)
 		}
 	})
 }
