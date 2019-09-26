@@ -116,17 +116,29 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 		return handleError(400), nil
 	}
 
+	header := request.Headers["Content-Type"]
+	var format string
+	if header != "application/json" {
+		format = "html"
+	} else {
+		format = "json"
+	}
+
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	sqlHandler, _ := infrastructure.NewSqlHandler(c)
 	testController := controller.NewPostController(sqlHandler)
 
-	post, status := testController.Show(postId)
+	post, status := testController.Show(postId, format)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
 
-	return apiResponse(fmt.Sprintf("%s", post), status), nil
+	if format == "json" {
+		return apiResponse(fmt.Sprintf("%s", post), status), nil
+	} else {
+		return ogpResponse(fmt.Sprintf("%s", post), status), nil
+	}
 }
 
 func createUser(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -204,6 +216,14 @@ func apiResponse(message string, status int) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		Body:       message,
 		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+		StatusCode: status,
+	}
+}
+
+func ogpResponse(message string, status int) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{
+		Body:       message,
+		Headers:    map[string]string{"Content-Type": "text/html", "Access-Control-Allow-Origin": "*"},
 		StatusCode: status,
 	}
 }
