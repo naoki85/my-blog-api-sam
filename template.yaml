@@ -19,7 +19,7 @@ Globals:
         DBNAME: dbname
   Api:
     Cors:
-      AllowMethods: "'OPTIONS,POST,GET'"
+      AllowMethods: "'OPTIONS,POST,GET,DELETE'"
       AllowHeaders: "'Content-Type,Authorization'"
       AllowOrigin: "'*'"
 

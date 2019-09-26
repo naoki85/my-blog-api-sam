@@ -111,7 +111,7 @@ func ogpHtml(post model.Post) ([]byte, error) {
 	html = html + fmt.Sprintf(`<meta property="og:url" content="https://blog.naoki85.me/posts/%d">`, post.Id)
 	html = html + fmt.Sprintf(`<meta property="og:image" content="%s">`, post.ImageUrl)
 	html = html + fmt.Sprint(`<meta property="og:site_name" content="naoki85 のブログ">`)
-	html = html + fmt.Sprintf(`<meta property="og:description" content="%s">`, post.Content)
+	html = html + fmt.Sprintf(`<meta property="og:description" content="%s">`, post.Content[:160])
 	html = html + fmt.Sprint(`<meta property="og:locale" content="ja_JP">`)
 	html = html + fmt.Sprint(`<meta name="twitter:card" content="summary">`)
 	html = html + fmt.Sprint(`<meta name="twitter:site" content="@tony_201612">`)
