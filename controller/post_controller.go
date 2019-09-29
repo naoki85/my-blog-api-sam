@@ -102,6 +102,12 @@ func (controller *PostController) Show(id int, format string) ([]byte, int) {
 
 func ogpHtml(post model.Post) ([]byte, error) {
 	var html string
+	var content string
+	if len(post.Content) < 160 {
+		content = post.Content
+	} else {
+		content = post.Content[:160]
+	}
 	html = fmt.Sprint(`<!DOCTYPE html><html lang="ja"><head><title>naoki85 のブログ</title>`)
 	html = html + fmt.Sprint(`<link rel="shortcut icon" type="image/x-icon" href="//d1mtswcgj7q8jb.cloudfront.net/assets/commons/favicon-de7e93026202b78eff192fcda074c780a0f6cfb4e11f591eab829a0ef91c965f.ico" /><meta charset="utf-8">`)
 	html = html + fmt.Sprintf(`<title>%s</title>`, post.Title)
@@ -111,7 +117,7 @@ func ogpHtml(post model.Post) ([]byte, error) {
 	html = html + fmt.Sprintf(`<meta property="og:url" content="https://blog.naoki85.me/posts/%d">`, post.Id)
 	html = html + fmt.Sprintf(`<meta property="og:image" content="%s">`, post.ImageUrl)
 	html = html + fmt.Sprint(`<meta property="og:site_name" content="naoki85 のブログ">`)
-	html = html + fmt.Sprintf(`<meta property="og:description" content="%s">`, post.Content[:160])
+	html = html + fmt.Sprintf(`<meta property="og:description" content="%s">`, content)
 	html = html + fmt.Sprint(`<meta property="og:locale" content="ja_JP">`)
 	html = html + fmt.Sprint(`<meta name="twitter:card" content="summary">`)
 	html = html + fmt.Sprint(`<meta name="twitter:site" content="@tony_201612">`)

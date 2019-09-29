@@ -66,7 +66,7 @@ func (repo *RecommendedBookRepository) All(limit int) (recommendedBooks model.Re
 
 func (repo *RecommendedBookRepository) Create(params RecommendedBookCreateParams) error {
 	query := "INSERT INTO recommended_books (link, image_url, button_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
-	now := time.Now().Format("2006-01-02 03-04-05")
+	now := time.Now().Format("2006-01-02 15-04-05")
 	_, err := repo.SqlHandler.Execute(query, params.Link, params.ImageUrl, params.ButtonUrl, now, now)
 	if err != nil {
 		log.Printf("%s", err.Error())
