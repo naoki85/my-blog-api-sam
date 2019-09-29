@@ -23,6 +23,9 @@ services:
       - 3307:8000
     networks:
       - lambda-local
+    command: -jar DynamoDBLocal.jar -dbPath /data
+    volumes:
+      - $PWD/docker/dynamodb/data:/data
 volumes:
   bookrecorder-mysql-data:
     external:
