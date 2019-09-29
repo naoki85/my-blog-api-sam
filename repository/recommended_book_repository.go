@@ -1,6 +1,11 @@
 package repository
 
 import (
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/model"
 	"log"
 	"time"
@@ -17,6 +22,27 @@ type RecommendedBookCreateParams struct {
 }
 
 func (repo *RecommendedBookRepository) All(limit int) (recommendedBooks model.RecommendedBooks, err error) {
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	dynamoSession, err := session.NewSession(&aws.Config{
+		Credentials: credentials.NewStaticCredentials("hogehoge", "fugafuga", ""),
+		Region:      aws.String("ap-northeast-1"),
+		Endpoint:    aws.String(c.DynamoDbEndpoint),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	db := dynamodb.New(dynamoSession)
+	response, err2 := db.Scan(&dynamodb.ScanInput{
+		TableName:            aws.String("RecommendedBooks"),
+		ProjectionExpression: aws.String("Id, Link, ImageUrl, ButtonUrl"),
+	})
+	log.Printf("dynamodb: %v", response)
+	if err2 != nil {
+		log.Printf("dynamodbErr: %v", err2)
+	}
+
 	query := "SELECT id, link, image_url, button_url FROM recommended_books"
 	query = query + " ORDER BY id DESC LIMIT ?"
 	rows, err := repo.SqlHandler.Query(query, limit)

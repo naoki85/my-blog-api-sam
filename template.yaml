@@ -17,6 +17,7 @@ Globals:
         HOST: host
         PORT: port
         DBNAME: dbname
+        DYNAMODB_ENDPOINT: dynamodb
   Api:
     Cors:
       AllowMethods: "'OPTIONS,POST,GET,DELETE'"
@@ -79,6 +80,7 @@ Resources:
           HOST: host
           PORT: port
           DBNAME: dbname
+          DYNAMODB_ENDPOINT: dynamodb
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
       VpcConfig:
         SecurityGroupIds: ["sg-0351ecbd14859fcfe"]

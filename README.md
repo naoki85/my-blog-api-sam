@@ -81,3 +81,18 @@ go test ./usecase -v -cover
 go test ./controller -v -cover
 go test ./handler -v -cover
 ```
+
+## DynamoDB Tips
+
+### CLI
+
+```bash
+# Create table
+$ aws dynamodb create-table --cli-input-json file://docker/dynamodb/table.json --endpoint-url http://127.0.0.1:3307 --region ap-northeast-1
+# Show table
+$ aws dynamodb describe-table --table-name TableName --endpoint-url http://127.0.0.1:3307 --region ap-north-east-1
+# Insert test data
+$ aws dynamodb batch-write-item --request-items file://docker/dynamodb/data.json --endpoint-url http://127.0.0.1:3307 --region ap-north-east-1
+# Delete table
+$ aws dynamodb delete-table --table-name TableName --endpoint-url  http://127.0.0.1:3307 --region ap-northeast-1
+```

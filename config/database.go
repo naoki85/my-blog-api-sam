@@ -6,11 +6,12 @@ import (
 )
 
 type Config struct {
-	Username string
-	Password string
-	Host     string
-	Port     string
-	Database string
+	Username         string
+	Password         string
+	Host             string
+	Port             string
+	Database         string
+	DynamoDbEndpoint string
 }
 
 var instance *Config
@@ -21,19 +22,21 @@ func InitDbConf(env string) {
 		testFlag := os.Getenv("TEST_FLAG")
 		if testFlag != "" {
 			instance = &Config{
-				Username: "root",
-				Password: "root",
-				Host:     "127.0.0.1",
-				Port:     "3306",
-				Database: "book_recorder_test",
+				Username:         "root",
+				Password:         "root",
+				Host:             "127.0.0.1",
+				Port:             "3306",
+				Database:         "book_recorder_test",
+				DynamoDbEndpoint: "http://localhost:3307",
 			}
 		} else {
 			instance = &Config{
-				Username: os.Getenv("USERNAME"),
-				Password: os.Getenv("PASSWORD"),
-				Host:     os.Getenv("HOST"),
-				Port:     os.Getenv("PORT"),
-				Database: os.Getenv("DBNAME"),
+				Username:         os.Getenv("USERNAME"),
+				Password:         os.Getenv("PASSWORD"),
+				Host:             os.Getenv("HOST"),
+				Port:             os.Getenv("PORT"),
+				Database:         os.Getenv("DBNAME"),
+				DynamoDbEndpoint: os.Getenv("DYNAMODB_ENDPOINT"),
 			}
 		}
 	})
