@@ -32,7 +32,7 @@ func TestPostHandler(t *testing.T) {
 	t.Run("posts/1", func(t *testing.T) {
 		res, err := handler(events.APIGatewayProxyRequest{
 			Path:           "/posts/1",
-			Headers:        map[string]string{"Content-Type": "application/json"},
+			Headers:        map[string]string{"content-type": "application/json"},
 			PathParameters: map[string]string{"id": "1"},
 		})
 		if err != nil {

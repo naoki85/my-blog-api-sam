@@ -117,7 +117,7 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 		return handleError(400), nil
 	}
 
-	header := request.Headers["Content-Type"]
+	header := request.Headers["content-type"]
 	log.Printf("request-content-type: %v", request.Headers)
 	var format string
 	if strings.Contains(header, "application/json") {
@@ -217,7 +217,7 @@ func handleError(status int) events.APIGatewayProxyResponse {
 func apiResponse(message string, status int) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		Body:       message,
-		Headers:    map[string]string{"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+		Headers:    map[string]string{"content-type": "application/json", "Access-Control-Allow-Origin": "*"},
 		StatusCode: status,
 	}
 }
@@ -225,7 +225,7 @@ func apiResponse(message string, status int) events.APIGatewayProxyResponse {
 func ogpResponse(message string, status int) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		Body:       message,
-		Headers:    map[string]string{"Content-Type": "text/html", "Access-Control-Allow-Origin": "*"},
+		Headers:    map[string]string{"content-type": "text/html", "Access-Control-Allow-Origin": "*"},
 		StatusCode: status,
 	}
 }

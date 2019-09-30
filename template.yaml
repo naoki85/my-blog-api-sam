@@ -20,7 +20,7 @@ Globals:
   Api:
     Cors:
       AllowMethods: "'OPTIONS,POST,GET,DELETE'"
-      AllowHeaders: "'Content-Type,Authorization'"
+      AllowHeaders: "'content-type,Authorization'"
       AllowOrigin: "'*'"
 
 Resources:
