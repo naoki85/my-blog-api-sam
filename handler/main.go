@@ -118,7 +118,7 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 	}
 
 	header := request.Headers["Content-Type"]
-	log.Printf("request-content-type: %s", header)
+	log.Printf("request-content-type: %v", request.Headers)
 	var format string
 	if strings.Contains(header, "application/json") {
 		format = "json"
