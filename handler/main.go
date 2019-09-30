@@ -7,7 +7,6 @@ import (
 	"github.com/naoki85/my-blog-api-sam/controller"
 	"github.com/naoki85/my-blog-api-sam/infrastructure"
 	"github.com/naoki85/my-blog-api-sam/usecase"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -117,10 +116,9 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 		return handleError(400), nil
 	}
 
-	header := request.Headers["content-type"]
-	log.Printf("request-content-type: %v", request.Headers)
 	var format string
-	if strings.Contains(header, "application/json") {
+	if request.Headers["Content-Type"] == "application/json" ||
+		request.Headers["content-type"] == "application/json" {
 		format = "json"
 	} else {
 		format = "html"
