@@ -7,6 +7,7 @@ import (
 	"github.com/naoki85/my-blog-api-sam/controller"
 	"github.com/naoki85/my-blog-api-sam/infrastructure"
 	"github.com/naoki85/my-blog-api-sam/usecase"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -117,11 +118,12 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 	}
 
 	header := request.Headers["Content-Type"]
+	log.Printf("request-content-type: %s", header)
 	var format string
-	if header != "application/json" {
-		format = "html"
-	} else {
+	if strings.Contains(header, "application/json") {
 		format = "json"
+	} else {
+		format = "html"
 	}
 
 	config.InitDbConf("")
