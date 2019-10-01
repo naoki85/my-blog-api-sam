@@ -85,7 +85,6 @@ func (interactor *UserInteractor) CheckAuthenticationToken(authenticationToken s
 	}
 	if user.Id == 0 {
 		err = errors.New("not found")
-		log.Printf("%s", err.Error())
 	}
 	return user, err
 }

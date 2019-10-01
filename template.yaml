@@ -17,6 +17,7 @@ Globals:
         HOST: host
         PORT: port
         DBNAME: dbname
+        DYNAMODB_ENDPOINT: ""
   Api:
     Cors:
       AllowMethods: "'OPTIONS,POST,GET,DELETE'"
@@ -79,6 +80,7 @@ Resources:
           HOST: host
           PORT: port
           DBNAME: dbname
+          DYNAMODB_ENDPOINT: ""
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
       VpcConfig:
         SecurityGroupIds: ["sg-0351ecbd14859fcfe"]
@@ -91,6 +93,16 @@ Resources:
       AccessLogSetting:
         DestinationArn: "arn:aws:logs:ap-northeast-1:873781314098:log-group:/aws/apigateway/accesslog"
         Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "caller":"$context.identity.caller", "user":"$context.identity.user","requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath", "status":"$context.status","protocol":"$context.protocol", "responseLength":"$context.responseLength" }'
+  RecommendedBooksDynamoDBTable:
+    Type: AWS::Serverless::SimpleTable
+    TableName: "RecommendedBooks"
+    Properties:
+      PrimaryKey:
+        Name: Id
+        Type: Number
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

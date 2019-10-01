@@ -38,7 +38,7 @@ func (repo *UserRepository) FindBy(key string, value string) (user model.User, e
 
 func (repo *UserRepository) FindByAuthenticationToken(value string) (user model.User, err error) {
 	query := "SELECT id FROM users WHERE authentication_token = ? AND authentication_token_expired_at >= ? LIMIT 1"
-	now := time.Now().Format("2006-01-02 03-04-05")
+	now := time.Now().Format("2006-01-02 15-04-05")
 	rows, err := repo.SqlHandler.Query(query, value, now)
 	if err != nil {
 		log.Printf("%s", err.Error())
@@ -59,7 +59,7 @@ func (repo *UserRepository) FindByAuthenticationToken(value string) (user model.
 
 func (repo *UserRepository) UpdateAttribute(id int, field string, param string) (bool, error) {
 	query := fmt.Sprintf("UPDATE users SET %s = ?, updated_at = ? WHERE id = ? LIMIT 1", field)
-	now := time.Now().Format("2006-01-02 03-04-05")
+	now := time.Now().Format("2006-01-02 15-04-05")
 	_, err := repo.SqlHandler.Execute(query, param, now, id)
 	if err != nil {
 		log.Printf("%s", err.Error())
@@ -71,7 +71,7 @@ func (repo *UserRepository) UpdateAttribute(id int, field string, param string) 
 
 func (repo *UserRepository) Create(params UserCreateParams) (bool, error) {
 	query := "INSERT INTO users (email, encrypted_password, created_at, updated_at) VALUES (?, ?, ?, ?)"
-	now := time.Now().Format("2006-01-02 03-04-05")
+	now := time.Now().Format("2006-01-02 15-04-05")
 	_, err := repo.SqlHandler.Execute(query, params.Email, params.Password, now, now)
 	if err != nil {
 		log.Printf("%s", err.Error())

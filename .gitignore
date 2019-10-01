@@ -2,3 +2,5 @@
 env.production.json
 handler/handler
 packaged.yaml
+docker/dynamodb/data/*
+!docker/dynamodb/data/.keep

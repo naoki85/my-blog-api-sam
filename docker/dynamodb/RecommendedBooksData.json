@@ -1,0 +1,64 @@
+{
+  "RecommendedBooks": [
+    {
+      "PutRequest": {
+        "Item": {
+          "Id": { "N": "1" },
+          "Link": { "S": "http://test/link/1" },
+          "ImageUrl": { "S": "http://test/image_url/1" },
+          "ButtonUrl": { "S": "http://test/button_url/1" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Id": { "N": "2" },
+          "Link": { "S": "http://test/link/2" },
+          "ImageUrl": { "S": "http://test/image_url/2" },
+          "ButtonUrl": { "S": "http://test/button_url/2" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Id": { "N": "3" },
+          "Link": { "S": "http://test/link/3" },
+          "ImageUrl": { "S": "http://test/image_url/3" },
+          "ButtonUrl": { "S": "http://test/button_url/3" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Id": { "N": "4" },
+          "Link": { "S": "http://test/link/4" },
+          "ImageUrl": { "S": "http://test/image_url/4" },
+          "ButtonUrl": { "S": "http://test/button_url/4" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Id": { "N": "5" },
+          "Link": { "S": "http://test/link/5" },
+          "ImageUrl": { "S": "http://test/image_url/5" },
+          "ButtonUrl": { "S": "http://test/button_url/5" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    }
+  ]
+}
