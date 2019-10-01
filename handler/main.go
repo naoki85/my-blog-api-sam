@@ -61,8 +61,7 @@ func recommendedBooks(request events.APIGatewayProxyRequest) (events.APIGatewayP
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
-	testController := controller.NewRecommendedBookController(sqlHandler, dynamoDbHandler)
+	testController := controller.NewRecommendedBookController(sqlHandler)
 	recommendedBooks, status := testController.Index()
 
 	if status != config.SuccessStatus {
@@ -83,8 +82,7 @@ func createRecommendedBook(request events.APIGatewayProxyRequest) (events.APIGat
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
-	testController := controller.NewRecommendedBookController(sqlHandler, dynamoDbHandler)
+	testController := controller.NewRecommendedBookController(sqlHandler)
 	recommendedBooks, status := testController.Create(params)
 
 	if status != config.SuccessStatus {

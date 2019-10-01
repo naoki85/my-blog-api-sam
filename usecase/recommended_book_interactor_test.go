@@ -2,18 +2,15 @@ package usecase
 
 import (
 	"github.com/naoki85/my-blog-api-sam/repository"
-	"github.com/naoki85/my-blog-api-sam/testSupport"
 	"testing"
 )
 
 func TestShouldFindAllRecommendedBooks(t *testing.T) {
 	sqlHandler, tearDown := SetupTest()
-	dynamoDbHandler, _ := testSupport.NewDynamoDbHandler()
 	defer tearDown()
 	interactor := RecommendedBookInteractor{
 		RecommendedBookRepository: &repository.RecommendedBookRepository{
 			sqlHandler,
-			dynamoDbHandler,
 		},
 	}
 
@@ -33,12 +30,10 @@ func TestShouldFindAllRecommendedBooks(t *testing.T) {
 
 func TestShouldCreateRecommendedBook(t *testing.T) {
 	sqlHandler, tearDown := SetupTest()
-	dynamoDbHandler, _ := testSupport.NewDynamoDbHandler()
 	defer tearDown()
 	interactor := RecommendedBookInteractor{
 		RecommendedBookRepository: &repository.RecommendedBookRepository{
 			sqlHandler,
-			dynamoDbHandler,
 		},
 	}
 

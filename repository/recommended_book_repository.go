@@ -2,7 +2,10 @@ package repository
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/model"
 	"log"
 	"os"
@@ -11,7 +14,6 @@ import (
 
 type RecommendedBookRepository struct {
 	SqlHandler
-	DynamoDBHandler *dynamodb.DynamoDB
 }
 
 type RecommendedBookCreateParams struct {
@@ -22,7 +24,27 @@ type RecommendedBookCreateParams struct {
 
 func (repo *RecommendedBookRepository) All(limit int) (recommendedBooks model.RecommendedBooks, err error) {
 	tableName := os.Getenv("RECOMMENDED_BOOKS_TABLE_NAME")
-	response, err2 := repo.DynamoDBHandler.Scan(&dynamodb.ScanInput{
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	var awsConf *aws.Config
+	if len(c.DynamoDbEndpoint) > 0 {
+		awsConf = &aws.Config{
+			Credentials: credentials.NewStaticCredentials("hogehoge", "fugafuga", ""),
+			Region:      aws.String("ap-northeast-1"),
+			Endpoint:    aws.String(c.DynamoDbEndpoint),
+		}
+	} else {
+		awsConf = &aws.Config{
+			Region: aws.String("ap-northeast-1"),
+		}
+	}
+	dynamoSession, err := session.NewSession(awsConf)
+	if err != nil {
+		panic(err)
+	}
+
+	db := dynamodb.New(dynamoSession)
+	response, err2 := db.Scan(&dynamodb.ScanInput{
 		TableName:            aws.String(tableName),
 		ProjectionExpression: aws.String("Id, Link, ImageUrl, ButtonUrl"),
 	})
