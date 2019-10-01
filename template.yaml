@@ -18,6 +18,7 @@ Globals:
         PORT: port
         DBNAME: dbname
         DYNAMODB_ENDPOINT: ""
+        RECOMMENDED_BOOKS_TABLE_NAME: RecommendedBooks
   Api:
     Cors:
       AllowMethods: "'OPTIONS,POST,GET,DELETE'"
@@ -81,6 +82,7 @@ Resources:
           PORT: port
           DBNAME: dbname
           DYNAMODB_ENDPOINT: ""
+          RECOMMENDED_BOOKS_TABLE_NAME: !Ref RecommendedBooksDynamoDBTable
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
       VpcConfig:
         SecurityGroupIds: ["sg-0351ecbd14859fcfe"]
