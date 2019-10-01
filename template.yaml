@@ -5,6 +5,22 @@ Description: >
   
   Sample SAM Template for my-blog-api-sam
 
+Parameters:
+  UserName:
+    Type: String
+    Default: ""
+  Password:
+    Type: String
+    Default: ""
+  Host:
+    Type: String
+    Default: ""
+  Port:
+    Type: String
+    Default: "3306"
+  DbName:
+    Type: String
+    Default: ""
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -17,6 +33,7 @@ Globals:
         HOST: host
         PORT: port
         DBNAME: dbname
+        TZ: Asia/Tokyo
         DYNAMODB_ENDPOINT: ""
         RECOMMENDED_BOOKS_TABLE_NAME: RecommendedBooks
   Api:
@@ -76,11 +93,12 @@ Resources:
             Method: DELETE
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
-          USERNAME: username
-          PASSWORD: password
-          HOST: host
-          PORT: port
-          DBNAME: dbname
+          USERNAME: !Ref UserName
+          PASSWORD: !Ref Password
+          HOST: !Ref Host
+          PORT: !Ref Port
+          DBNAME: !Ref DbName
+          TZ: Asia/Tokyo
           DYNAMODB_ENDPOINT: ""
           RECOMMENDED_BOOKS_TABLE_NAME: !Ref RecommendedBooksDynamoDBTable
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
