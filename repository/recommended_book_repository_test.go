@@ -1,15 +1,18 @@
 package repository
 
 import (
+	"github.com/naoki85/my-blog-api-sam/testSupport"
 	"gopkg.in/DATA-DOG/go-sqlmock.v2"
 	"testing"
 )
 
 func TestShouldFindAllRecommendedBooks(t *testing.T) {
+	dynamoDbHandler, _ := testSupport.NewDynamoDbHandler()
 	mockSqlHandler, _ := NewMockSqlHandler()
 	mockSqlHandler.ResistMock("^SELECT (.+) FROM recommended_books .*", []string{"id", "link", "image_url", "button_url"})
 	repo := RecommendedBookRepository{
-		SqlHandler: mockSqlHandler,
+		SqlHandler:      mockSqlHandler,
+		DynamoDBHandler: dynamoDbHandler,
 	}
 	recommendedBooks, err := repo.All(4)
 	if err != nil {
