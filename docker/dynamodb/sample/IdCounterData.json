@@ -1,0 +1,12 @@
+{
+  "IdCounter": [
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "RecommendedBooks" },
+          "MaxId": { "N": "5" }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "Identifier",
+      "AttributeType": "S"
+    }
+  ],
+  "TableName": "IdCounter",
+  "KeySchema": [
+    {
+      "AttributeName": "Identifier",
+      "KeyType": "HASH"
+    }
+  ],
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 1,
+    "WriteCapacityUnits": 1
+  }
+}

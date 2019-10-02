@@ -36,6 +36,7 @@ Globals:
         TZ: Asia/Tokyo
         DYNAMODB_ENDPOINT: ""
         RECOMMENDED_BOOKS_TABLE_NAME: RecommendedBooks
+        ID_COUNTER_TABLE_NAME: IdCounter
   Api:
     Cors:
       AllowMethods: "'OPTIONS,POST,GET,DELETE'"
@@ -101,6 +102,7 @@ Resources:
           TZ: Asia/Tokyo
           DYNAMODB_ENDPOINT: ""
           RECOMMENDED_BOOKS_TABLE_NAME: !Ref RecommendedBooksDynamoDBTable
+          ID_COUNTER_TABLE_NAME: !Ref IdCounterDynamoDBTable
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
       VpcConfig:
         SecurityGroupIds: ["sg-0351ecbd14859fcfe"]
@@ -120,6 +122,16 @@ Resources:
       PrimaryKey:
         Name: Id
         Type: Number
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+  IdCounterDynamoDBTable:
+    Type: AWS::Serverless::SimpleTable
+    TableName: "IdCounter"
+    Properties:
+      PrimaryKey:
+        Name: Id
+        Type: String
       ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
