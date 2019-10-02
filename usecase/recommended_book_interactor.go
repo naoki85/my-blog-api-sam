@@ -8,6 +8,7 @@ import (
 
 type RecommendedBookInteractor struct {
 	RecommendedBookRepository RecommendedBookRepository
+	IdCounterRepository       IdCounterRepository
 }
 
 type RecommendedBookInteractorCreateParams struct {
@@ -22,8 +23,21 @@ func (interactor *RecommendedBookInteractor) All(limit int) (recommendedBooks mo
 		log.Fatalln(err.Error())
 		return
 	}
+
+	count, err := interactor.IdCounterRepository.FindCountByIdentifier("RecommendedBooks")
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+
+	var minId int
+	if count-limit > 0 {
+		minId = count - limit
+	} else {
+		minId = 0
+	}
 	for _, book := range results {
-		if book.Id > 0 {
+		if book.Id > minId {
 			recommendedBooks = append(recommendedBooks, book)
 		}
 	}

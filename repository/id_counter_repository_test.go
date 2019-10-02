@@ -10,7 +10,7 @@ func TestShouldFindCountByIdentifier(t *testing.T) {
 	repo := IdCounterRepository{
 		DynamoDBHandler: dynamoDbHandler,
 	}
-	count, err := repo.TestShouldFindCountByIdentifier("RecommendedBooks")
+	count, err := repo.FindCountByIdentifier("RecommendedBooks")
 	if err != nil {
 		t.Fatalf("Cannot get recommended_books: %s", err)
 	}

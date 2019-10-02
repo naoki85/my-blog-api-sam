@@ -15,14 +15,17 @@ func TestShouldFindAllRecommendedBooks(t *testing.T) {
 			sqlHandler,
 			dynamoDbHandler,
 		},
+		IdCounterRepository: &repository.IdCounterRepository{
+			DynamoDBHandler: dynamoDbHandler,
+		},
 	}
 
-	recommendedBooks, err := interactor.RecommendedBookRepository.All()
+	recommendedBooks, err := interactor.All(4)
 	if err != nil {
 		t.Fatalf("Cannot get recommended_books: %s", err)
 	}
-	if len(recommendedBooks) != 5 {
-		t.Fatalf("Fail expected: 5, got: %v", len(recommendedBooks))
+	if len(recommendedBooks) != 4 {
+		t.Fatalf("Fail expected: 4, got: %v", len(recommendedBooks))
 	}
 }
 
