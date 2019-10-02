@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/model"
 	"github.com/naoki85/my-blog-api-sam/repository"
@@ -13,11 +14,13 @@ type RecommendedBookController struct {
 	Interactor usecase.RecommendedBookInteractor
 }
 
-func NewRecommendedBookController(sqlHandler repository.SqlHandler) *RecommendedBookController {
+func NewRecommendedBookController(sqlHandler repository.SqlHandler,
+	dynamoDbHandler *dynamodb.DynamoDB) *RecommendedBookController {
 	return &RecommendedBookController{
 		Interactor: usecase.RecommendedBookInteractor{
 			RecommendedBookRepository: &repository.RecommendedBookRepository{
-				SqlHandler: sqlHandler,
+				SqlHandler:      sqlHandler,
+				DynamoDBHandler: dynamoDbHandler,
 			},
 		},
 	}
