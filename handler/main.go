@@ -22,7 +22,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		if request.HTTPMethod == "POST" {
 			return requireLogin(createRecommendedBook, request)
 		} else {
-			return recommendedBooks(request)
+			return recommendedBooks()
 		}
 	} else if request.Path == "/posts" {
 		return posts(request)
@@ -57,7 +57,7 @@ func requireLogin(f func(events.APIGatewayProxyRequest) (events.APIGatewayProxyR
 	return f(request)
 }
 
-func recommendedBooks(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func recommendedBooks() (events.APIGatewayProxyResponse, error) {
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	sqlHandler, _ := infrastructure.NewSqlHandler(c)

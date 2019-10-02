@@ -14,10 +14,6 @@ func TestShouldFindAllRecommendedBooks(t *testing.T) {
 	dynamoDbHandler, _ := testSupport.NewDynamoDbHandler()
 	defer tearDown()
 	controller := NewRecommendedBookController(sqlHandler, dynamoDbHandler)
-	_, _ = sqlHandler.Execute("INSERT INTO `recommended_books` VALUES (1,6,'http://test.example.com/hoge','http://test.example.com/hoge.png','http://test.example.com/hoge.png',0,'2018-12-30 17:00:14','2018-12-30 17:00:25')")
-	_, _ = sqlHandler.Execute("INSERT INTO `recommended_books` VALUES (2,6,'http://test.example.com/hoge','http://test.example.com/hoge.png','http://test.example.com/hoge.png',0,'2018-12-30 17:00:14','2018-12-30 17:00:25')")
-	_, _ = sqlHandler.Execute("INSERT INTO `recommended_books` VALUES (3,6,'http://test.example.com/hoge','http://test.example.com/hoge.png','http://test.example.com/hoge.png',0,'2018-12-30 17:00:14','2018-12-30 17:00:25')")
-	_, _ = sqlHandler.Execute("INSERT INTO `recommended_books` VALUES (4,6,'http://test.example.com/hoge','http://test.example.com/hoge.png','http://test.example.com/hoge.png',0,'2018-12-30 17:00:14','2018-12-30 17:00:25')")
 
 	recommendedBooks, status := controller.Index()
 	if status != config.SuccessStatus {

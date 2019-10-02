@@ -22,13 +22,16 @@ func NewRecommendedBookController(sqlHandler repository.SqlHandler,
 				SqlHandler:      sqlHandler,
 				DynamoDBHandler: dynamoDbHandler,
 			},
+			IdCounterRepository: &repository.IdCounterRepository{
+				DynamoDBHandler: dynamoDbHandler,
+			},
 		},
 	}
 }
 
 func (controller *RecommendedBookController) Index() ([]byte, int) {
 	limit := 4
-	recommendedBooks, err := controller.Interactor.RecommendedBookRepository.All(limit)
+	recommendedBooks, err := controller.Interactor.All(limit)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return []byte{}, config.NotFoundStatus
