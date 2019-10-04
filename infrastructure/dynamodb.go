@@ -10,12 +10,17 @@ import (
 )
 
 func NewDynamoDbHandler(c *config.Config) (*dynamodb.DynamoDB, error) {
-	awsConf := &aws.Config{
-		Region: aws.String("ap-northeast-1"),
-	}
-	if c.DynamoDbEndpoint != "" {
-		awsConf.Credentials = credentials.NewStaticCredentials("hogehoge", "fugafuga", "")
-		awsConf.Endpoint = aws.String(c.DynamoDbEndpoint)
+	var awsConf *aws.Config
+	if len(c.DynamoDbEndpoint) > 0 {
+		awsConf = &aws.Config{
+			Credentials: credentials.NewStaticCredentials("hogehoge", "fugafuga", ""),
+			Region:      aws.String("ap-northeast-1"),
+			Endpoint:    aws.String(c.DynamoDbEndpoint),
+		}
+	} else {
+		awsConf = &aws.Config{
+			Region: aws.String("ap-northeast-1"),
+		}
 	}
 	dynamoSession, err := session.NewSession(awsConf)
 	if err != nil {

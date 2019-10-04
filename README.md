@@ -88,11 +88,13 @@ go test ./handler -v -cover
 
 ```bash
 # Create table
-$ aws dynamodb create-table --cli-input-json file://docker/dynamodb/table.json --endpoint-url http://127.0.0.1:3307 --region ap-northeast-1
+$ aws dynamodb create-table --cli-input-json file://docker/dynamodb/sample/table.json --endpoint-url http://127.0.0.1:3307 --region apnortheast-1
 # Show table
-$ aws dynamodb describe-table --table-name TableName --endpoint-url http://127.0.0.1:3307 --region ap-north-east-1
+$ aws dynamodb describe-table --table-name TableName --endpoint-url http://127.0.0.1:3307 --region ap-northeast-1
 # Insert test data
-$ aws dynamodb batch-write-item --request-items file://docker/dynamodb/data.json --endpoint-url http://127.0.0.1:3307 --region ap-north-east-1
+$ aws dynamodb batch-write-item --table-name TableName --request-items file://docker/dynamodb/sample/data.json --endpoint-url http://127.0.0.1:3307 --region ap-northeast-1
+# Scan table
+$ aws dynamodb scan --table-name TableName --endpoint-url http://127.0.0.1:3307 --region ap-northeast-1
 # Delete table
-$ aws dynamodb delete-table --table-name TableName --endpoint-url  http://127.0.0.1:3307 --region ap-northeast-1
+$ aws dynamodb delete-table --table-name TableName --endpoint-url http://127.0.0.1:3307 --region ap-northeast-1
 ```

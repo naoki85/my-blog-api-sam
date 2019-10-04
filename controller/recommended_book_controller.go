@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/model"
 	"github.com/naoki85/my-blog-api-sam/repository"
@@ -13,11 +14,16 @@ type RecommendedBookController struct {
 	Interactor usecase.RecommendedBookInteractor
 }
 
-func NewRecommendedBookController(sqlHandler repository.SqlHandler) *RecommendedBookController {
+func NewRecommendedBookController(sqlHandler repository.SqlHandler,
+	dynamoDbHandler *dynamodb.DynamoDB) *RecommendedBookController {
 	return &RecommendedBookController{
 		Interactor: usecase.RecommendedBookInteractor{
 			RecommendedBookRepository: &repository.RecommendedBookRepository{
-				SqlHandler: sqlHandler,
+				SqlHandler:      sqlHandler,
+				DynamoDBHandler: dynamoDbHandler,
+			},
+			IdCounterRepository: &repository.IdCounterRepository{
+				DynamoDBHandler: dynamoDbHandler,
 			},
 		},
 	}
@@ -25,7 +31,7 @@ func NewRecommendedBookController(sqlHandler repository.SqlHandler) *Recommended
 
 func (controller *RecommendedBookController) Index() ([]byte, int) {
 	limit := 4
-	recommendedBooks, err := controller.Interactor.RecommendedBookRepository.All(limit)
+	recommendedBooks, err := controller.Interactor.All(limit)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return []byte{}, config.NotFoundStatus

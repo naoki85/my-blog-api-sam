@@ -6,6 +6,6 @@ import (
 )
 
 type RecommendedBookRepository interface {
-	All(int) (model.RecommendedBooks, error)
+	All() (model.RecommendedBooks, error)
 	Create(params repository.RecommendedBookCreateParams) error
 }

@@ -19,7 +19,9 @@ func TestHandler(t *testing.T) {
 			t.Fatal("Everything should be ok")
 		}
 	})
+}
 
+func TestRecommendedBooksHandler(t *testing.T) {
 	t.Run("recommended_books", func(t *testing.T) {
 		_, err := handler(events.APIGatewayProxyRequest{Path: "/recommended_books"})
 		if err != nil {
