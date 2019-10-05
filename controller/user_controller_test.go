@@ -3,18 +3,15 @@ package controller
 import (
 	"fmt"
 	"github.com/naoki85/my-blog-api-sam/config"
-	"github.com/naoki85/my-blog-api-sam/infrastructure"
-	"github.com/naoki85/my-blog-api-sam/repository"
+	"github.com/naoki85/my-blog-api-sam/testSupport"
 	"github.com/naoki85/my-blog-api-sam/usecase"
-	"gopkg.in/DATA-DOG/go-sqlmock.v2"
 	"testing"
 )
 
 func TestShouldCreateUser(t *testing.T) {
-	mockSqlHandler, _ := repository.NewMockSqlHandler()
-	mockSqlHandler.Mock.ExpectExec("INSERT INTO users").
-		WillReturnResult(sqlmock.NewResult(1, 1))
-	controller := NewUserController(mockSqlHandler)
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
+	controller := NewUserController(dynamoDbHandler)
 
 	params := usecase.UserInteractorCreateParams{
 		Email:    "test@example.com",
@@ -28,9 +25,9 @@ func TestShouldCreateUser(t *testing.T) {
 }
 
 func TestShouldUserLoginAndLogout(t *testing.T) {
-	sqlHandler, tearDown := SetupTest()
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
-	controller := NewUserController(sqlHandler)
+	controller := NewUserController(dynamoDbHandler)
 	params := usecase.UserInteractorCreateParams{
 		Email:    "test@example.com",
 		Password: "password",
@@ -69,9 +66,9 @@ func TestShouldUserLoginAndLogout(t *testing.T) {
 }
 
 func TestCheckLoginStatus(t *testing.T) {
-	sqlHandler, tearDown := SetupTest()
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
-	controller := NewUserController(sqlHandler)
+	controller := NewUserController(dynamoDbHandler)
 	params := usecase.UserInteractorCreateParams{
 		Email:    "test@example.com",
 		Password: "password",
@@ -103,18 +100,4 @@ func TestCheckLoginStatus(t *testing.T) {
 			t.Fatalf("Should get 401 status, but got: %d", status)
 		}
 	})
-}
-
-func SetupTest() (repository.SqlHandler, func()) {
-	config.InitDbConf("")
-	c := config.GetDbConf()
-	sqlHandler, err := infrastructure.NewSqlHandler(c)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return sqlHandler, func() {
-		_, _ = sqlHandler.Execute("DELETE FROM users")
-		_, _ = sqlHandler.Execute("DELETE FROM recommended_books")
-	}
 }
