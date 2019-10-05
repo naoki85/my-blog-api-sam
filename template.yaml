@@ -138,8 +138,8 @@ Resources:
         WriteCapacityUnits: 1
   UsersDynamoDBTable:
     Type: AWS::DynamoDB::Table
-    TableName: "Users"
     Properties:
+      TableName: "Users"
       AttributeDefinitions:
         -
           AttributeName: "AuthenticationToken"
