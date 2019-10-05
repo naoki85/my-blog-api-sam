@@ -141,11 +141,26 @@ Resources:
     TableName: "Users"
     Properties:
       PrimaryKey:
-        Name: AuthenticationToken
+        Name: Email
         Type: String
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
+      GlobalSecondaryIndexes:
+        -
+          IndexName: "AuthenticationTokenIndex"
+          KeySchema:
+            -
+              AttributeName: "AuthenticationToken"
+              KeyType: "HASH"
+          Projection:
+            NonKeyAttributes:
+              - "Id"
+              - "EncryptedPassword"
+            ProjectionType: "INCLUDE"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
