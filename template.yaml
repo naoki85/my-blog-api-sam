@@ -137,12 +137,20 @@ Resources:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
   UsersDynamoDBTable:
-    Type: AWS::Serverless::SimpleTable
+    Type: AWS::DynamoDB::Table
     TableName: "Users"
     Properties:
-      PrimaryKey:
-        Name: Email
-        Type: String
+      AttributeDefinitions:
+        -
+          AttributeName: "AuthenticationToken"
+          AttributeType: "S"
+        -
+          AttributeName: "Email"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "Email"
+          KeyType: "HASH"
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1

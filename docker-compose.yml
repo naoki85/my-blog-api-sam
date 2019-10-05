@@ -18,19 +18,14 @@ services:
       DYNAMODB_ENDPOINT: http://dynamodb:8000
       RECOMMENDED_BOOKS_TABLE_NAME: RecommendedBooks
       ID_COUNTER_TABLE_NAME: IdCounter
-      USERS_TABLE_NAME: Users
     depends_on:
       - dynamodb
       - db
-    networks:
-      - lambda-local
   db:
     container_name: mysqlDb
     build:
       context: .
       dockerfile: ./docker/db/Dockerfile
-    ports:
-      - 3306:3306
     volumes:
       - bookrecorder-mysql-data:/var/lib/mysql
     environment:
@@ -38,15 +33,9 @@ services:
       MYSQL_USER: test
       MYSQL_PASSWORD: testpassword
       TZ: 'Asia/Tokyo'
-    networks:
-      - lambda-local
   dynamodb:
     image: amazon/dynamodb-local
     container_name: dynamoDb
-    ports:
-      - 3307:8000
-    networks:
-      - lambda-local
     command: -jar DynamoDBLocal.jar -dbPath /data
     volumes:
       - $PWD/docker/dynamodb/data:/data
@@ -54,6 +43,3 @@ volumes:
   bookrecorder-mysql-data:
     external:
       name: bookrecorder-mysql-data
-networks:
-  lambda-local:
-    external: true
