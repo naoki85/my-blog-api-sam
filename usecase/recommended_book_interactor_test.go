@@ -7,13 +7,11 @@ import (
 )
 
 func TestShouldFindAllRecommendedBooks(t *testing.T) {
-	sqlHandler, tearDown := SetupTest()
-	dynamoDbHandler, _ := testSupport.NewDynamoDbHandler()
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
 	interactor := RecommendedBookInteractor{
 		RecommendedBookRepository: &repository.RecommendedBookRepository{
-			sqlHandler,
-			dynamoDbHandler,
+			DynamoDBHandler: dynamoDbHandler,
 		},
 		IdCounterRepository: &repository.IdCounterRepository{
 			DynamoDBHandler: dynamoDbHandler,
@@ -30,13 +28,14 @@ func TestShouldFindAllRecommendedBooks(t *testing.T) {
 }
 
 func TestShouldCreateRecommendedBook(t *testing.T) {
-	sqlHandler, tearDown := SetupTest()
-	dynamoDbHandler, _ := testSupport.NewDynamoDbHandler()
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
 	interactor := RecommendedBookInteractor{
 		RecommendedBookRepository: &repository.RecommendedBookRepository{
-			sqlHandler,
-			dynamoDbHandler,
+			DynamoDBHandler: dynamoDbHandler,
+		},
+		IdCounterRepository: &repository.IdCounterRepository{
+			DynamoDBHandler: dynamoDbHandler,
 		},
 	}
 

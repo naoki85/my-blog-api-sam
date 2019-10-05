@@ -1,5 +1,6 @@
 package usecase
 
 type IdCounterRepository interface {
-	FindCountByIdentifier(string) (int, error)
+	FindMaxIdByIdentifier(string) (int, error)
+	UpdateMaxIdByIdentifier(string, int) (int, error)
 }

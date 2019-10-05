@@ -22,7 +22,7 @@ func (repo *IdCounterRepository) tableName() (tableName string) {
 	}
 }
 
-func (repo *IdCounterRepository) FindCountByIdentifier(identifier string) (count int, err error) {
+func (repo *IdCounterRepository) FindMaxIdByIdentifier(identifier string) (count int, err error) {
 	result, err := repo.DynamoDBHandler.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String(repo.tableName()),
 		Key: map[string]*dynamodb.AttributeValue{

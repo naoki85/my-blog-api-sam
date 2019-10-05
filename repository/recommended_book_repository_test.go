@@ -1,15 +1,14 @@
 package repository
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/naoki85/my-blog-api-sam/testSupport"
 	"log"
 	"testing"
 )
 
 func TestShouldFindAllRecommendedBooks(t *testing.T) {
-	dynamoDbHandler, _ := testSupport.NewDynamoDbHandler()
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
 	repo := RecommendedBookRepository{
 		DynamoDBHandler: dynamoDbHandler,
 	}
@@ -23,7 +22,8 @@ func TestShouldFindAllRecommendedBooks(t *testing.T) {
 }
 
 func TestShouldCreateRecommendedBook(t *testing.T) {
-	dynamoDbHandler, _ := testSupport.NewDynamoDbHandler()
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
 	repo := RecommendedBookRepository{
 		DynamoDBHandler: dynamoDbHandler,
 	}
@@ -37,20 +37,5 @@ func TestShouldCreateRecommendedBook(t *testing.T) {
 	log.Println(err)
 	if err != nil {
 		t.Fatalf("Cannot create recommended_book: %s", err)
-	}
-
-	input := &dynamodb.DeleteItemInput{
-		Key: map[string]*dynamodb.AttributeValue{
-			"Id": {
-				N: aws.String("6"),
-			},
-		},
-		TableName: aws.String("RecommendedBooks"),
-	}
-
-	_, err = dynamoDbHandler.DeleteItem(input)
-	if err != nil {
-		t.Fatal("Got error calling DeleteItem")
-		t.Fatal(err.Error())
 	}
 }
