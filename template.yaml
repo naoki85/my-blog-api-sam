@@ -103,6 +103,7 @@ Resources:
           DYNAMODB_ENDPOINT: ""
           RECOMMENDED_BOOKS_TABLE_NAME: !Ref RecommendedBooksDynamoDBTable
           ID_COUNTER_TABLE_NAME: !Ref IdCounterDynamoDBTable
+          USERS_TABLE_NAME: !Ref UsersDynamoDBTable
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
       VpcConfig:
         SecurityGroupIds: ["sg-0351ecbd14859fcfe"]
@@ -135,6 +136,31 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
+  UsersDynamoDBTable:
+    Type: AWS::Serverless::SimpleTable
+    TableName: "Users"
+    Properties:
+      PrimaryKey:
+        Name: Email
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      GlobalSecondaryIndexes:
+        -
+          IndexName: "AuthenticationTokenIndex"
+          KeySchema:
+            -
+              AttributeName: "AuthenticationToken"
+              KeyType: "HASH"
+          Projection:
+            NonKeyAttributes:
+              - "Id"
+              - "EncryptedPassword"
+            ProjectionType: "INCLUDE"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

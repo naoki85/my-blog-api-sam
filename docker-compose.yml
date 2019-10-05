@@ -18,6 +18,7 @@ services:
       DYNAMODB_ENDPOINT: http://dynamodb:8000
       RECOMMENDED_BOOKS_TABLE_NAME: RecommendedBooks
       ID_COUNTER_TABLE_NAME: IdCounter
+      USERS_TABLE_NAME: Users
     depends_on:
       - dynamodb
       - db

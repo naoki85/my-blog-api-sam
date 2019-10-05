@@ -7,6 +7,14 @@
           "MaxId": { "N": "5" }
         }
       }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "Users" },
+          "MaxId": { "N": "1" }
+        }
+      }
     }
   ]
 }

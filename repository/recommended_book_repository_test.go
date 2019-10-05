@@ -2,7 +2,6 @@ package repository
 
 import (
 	"github.com/naoki85/my-blog-api-sam/testSupport"
-	"log"
 	"testing"
 )
 
@@ -34,7 +33,6 @@ func TestShouldCreateRecommendedBook(t *testing.T) {
 		ButtonUrl: "http://test.example.com/hoge.png",
 	}
 	err := repo.Create(params)
-	log.Println(err)
 	if err != nil {
 		t.Fatalf("Cannot create recommended_book: %s", err)
 	}

@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/repository"
@@ -15,18 +16,21 @@ type UserController struct {
 	Interactor usecase.UserInteractor
 }
 
-func NewUserController(sqlHandler repository.SqlHandler) *UserController {
+func NewUserController(dynamoDbHandler *dynamodb.DynamoDB) *UserController {
 	return &UserController{
 		Interactor: usecase.UserInteractor{
 			UserRepository: &repository.UserRepository{
-				SqlHandler: sqlHandler,
+				DynamoDBHandler: dynamoDbHandler,
+			},
+			IdCounterRepository: &repository.IdCounterRepository{
+				DynamoDBHandler: dynamoDbHandler,
 			},
 		},
 	}
 }
 
 func (controller *UserController) Create(params usecase.UserInteractorCreateParams) ([]byte, int) {
-	_, err := controller.Interactor.Create(params)
+	err := controller.Interactor.Create(params)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return []byte{}, config.NotFoundStatus

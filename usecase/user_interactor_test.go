@@ -1,18 +1,20 @@
 package usecase
 
 import (
-	"github.com/naoki85/my-blog-api-sam/config"
-	"github.com/naoki85/my-blog-api-sam/infrastructure"
 	"github.com/naoki85/my-blog-api-sam/repository"
+	"github.com/naoki85/my-blog-api-sam/testSupport"
 	"testing"
 )
 
 func TestShouldCreateUserAndLogin(t *testing.T) {
-	sqlHandler, tearDown := SetupTest()
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
 	interactor := UserInteractor{
 		UserRepository: &repository.UserRepository{
-			sqlHandler,
+			DynamoDBHandler: dynamoDbHandler,
+		},
+		IdCounterRepository: &repository.IdCounterRepository{
+			DynamoDBHandler: dynamoDbHandler,
 		},
 	}
 
@@ -21,7 +23,7 @@ func TestShouldCreateUserAndLogin(t *testing.T) {
 		Password: "hogehoge",
 	}
 
-	_, err := interactor.Create(params)
+	err := interactor.Create(params)
 	if err != nil {
 		t.Fatalf("Could not create user: %s", err.Error())
 	}
@@ -35,11 +37,14 @@ func TestShouldCreateUserAndLogin(t *testing.T) {
 }
 
 func TestShouldCheckAuthenticationToken(t *testing.T) {
-	sqlHandler, tearDown := SetupTest()
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
 	interactor := UserInteractor{
 		UserRepository: &repository.UserRepository{
-			sqlHandler,
+			DynamoDBHandler: dynamoDbHandler,
+		},
+		IdCounterRepository: &repository.IdCounterRepository{
+			DynamoDBHandler: dynamoDbHandler,
 		},
 	}
 
@@ -49,7 +54,7 @@ func TestShouldCheckAuthenticationToken(t *testing.T) {
 			Password: "hogehoge",
 		}
 
-		_, err := interactor.Create(params)
+		err := interactor.Create(params)
 		if err != nil {
 			t.Fatalf("Could not create user: %s", err.Error())
 		}
@@ -78,11 +83,14 @@ func TestShouldCheckAuthenticationToken(t *testing.T) {
 }
 
 func TestShouldUserLogout(t *testing.T) {
-	sqlHandler, tearDown := SetupTest()
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
 	interactor := UserInteractor{
 		UserRepository: &repository.UserRepository{
-			sqlHandler,
+			DynamoDBHandler: dynamoDbHandler,
+		},
+		IdCounterRepository: &repository.IdCounterRepository{
+			DynamoDBHandler: dynamoDbHandler,
 		},
 	}
 
@@ -91,7 +99,7 @@ func TestShouldUserLogout(t *testing.T) {
 		Password: "hogehoge",
 	}
 
-	_, err := interactor.Create(params)
+	err := interactor.Create(params)
 	if err != nil {
 		t.Fatalf("Could not create user: %s", err.Error())
 	}
@@ -106,19 +114,5 @@ func TestShouldUserLogout(t *testing.T) {
 	err = interactor.Logout(user.AuthenticationToken)
 	if err != nil {
 		t.Fatalf("Could not logout: %s", err.Error())
-	}
-}
-
-func SetupTest() (repository.SqlHandler, func()) {
-	config.InitDbConf("")
-	c := config.GetDbConf()
-	sqlHandler, err := infrastructure.NewSqlHandler(c)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return sqlHandler, func() {
-		_, _ = sqlHandler.Execute("DELETE FROM users")
-		_, _ = sqlHandler.Execute("DELETE FROM recommended_books")
 	}
 }

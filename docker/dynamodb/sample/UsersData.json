@@ -1,0 +1,18 @@
+{
+  "Users": [
+    {
+      "PutRequest": {
+        "Item": {
+          "Id": { "N": "1" },
+          "Email": { "S": "hoge@example.com" },
+          "Username": { "S": "hoge" },
+          "EncryptedPassword": { "S": "$2a$10$CApMiGjZetwny0fnTRcqAevvsJuItyDmmHbXDNicjL.eZ4nlImrfG" },
+          "AuthenticationToken": { "S": "Q1LZlKFt2h0000001vER4TjyFo7" },
+          "AuthenticationTokenExpiredAt": { "S": "2019-02-20 21:56:36" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    }
+  ]
+}
