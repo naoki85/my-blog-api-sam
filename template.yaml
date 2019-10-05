@@ -103,6 +103,7 @@ Resources:
           DYNAMODB_ENDPOINT: ""
           RECOMMENDED_BOOKS_TABLE_NAME: !Ref RecommendedBooksDynamoDBTable
           ID_COUNTER_TABLE_NAME: !Ref IdCounterDynamoDBTable
+          USERS_TABLE_NAME: !Ref UsersDynamoDBTable
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
       VpcConfig:
         SecurityGroupIds: ["sg-0351ecbd14859fcfe"]
@@ -131,6 +132,16 @@ Resources:
     Properties:
       PrimaryKey:
         Name: Identifier
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+  UsersDynamoDBTable:
+    Type: AWS::Serverless::SimpleTable
+    TableName: "Users"
+    Properties:
+      PrimaryKey:
+        Name: AuthenticationToken
         Type: String
       ProvisionedThroughput:
         ReadCapacityUnits: 1
