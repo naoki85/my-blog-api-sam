@@ -41,7 +41,7 @@ func TestShouldUpdateAttribute(t *testing.T) {
 	repo := UserRepository{
 		DynamoDBHandler: dynamoDbHandler,
 	}
-	_, err := repo.UpdateAttribute("hoge@example.com", "AuthenticationToken", "hogehoge")
+	err := repo.UpdateAttribute("hoge@example.com", "AuthenticationToken", "hogehoge")
 	if err != nil {
 		t.Fatalf("Could not update: %s", err.Error())
 	}

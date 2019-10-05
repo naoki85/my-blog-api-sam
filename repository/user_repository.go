@@ -79,7 +79,7 @@ func (repo *UserRepository) FindByAuthenticationToken(value string) (user model.
 	return user, err
 }
 
-func (repo *UserRepository) UpdateAttribute(email string, field string, param string) (bool, error) {
+func (repo *UserRepository) UpdateAttribute(email string, field string, param string) (err error) {
 	input := &dynamodb.UpdateItemInput{
 		ExpressionAttributeNames: map[string]*string{
 			"#f": aws.String(field),
@@ -98,13 +98,13 @@ func (repo *UserRepository) UpdateAttribute(email string, field string, param st
 		ReturnValues:     aws.String("UPDATED_NEW"),
 		UpdateExpression: aws.String("set #f = :m"),
 	}
-	_, err := repo.DynamoDBHandler.UpdateItem(input)
+	_, err = repo.DynamoDBHandler.UpdateItem(input)
 	if err != nil {
 		log.Printf("dynamodbErr: %s", err.Error())
-		return false, err
+		return
 	}
 
-	return true, nil
+	return
 }
 
 func (repo *UserRepository) Create(params UserCreateParams) (err error) {

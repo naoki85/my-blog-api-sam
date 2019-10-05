@@ -13,10 +13,12 @@ import (
 )
 
 type UserInteractor struct {
-	UserRepository UserRepository
+	UserRepository      UserRepository
+	IdCounterRepository IdCounterRepository
 }
 
 type UserInteractorCreateParams struct {
+	Id       int
 	Email    string
 	Password string
 }
@@ -30,15 +32,29 @@ const (
 	rsLetterIdxMax  = 63 / rsLetterIdxBits
 )
 
-func (interactor *UserInteractor) Create(params UserInteractorCreateParams) (bool, error) {
+func (interactor *UserInteractor) Create(params UserInteractorCreateParams) (err error) {
 	var encryptedPassword []byte
-	var err error
 	encryptedPassword, err = bcrypt.GenerateFromPassword([]byte(params.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("%s", err.Error())
-		return false, err
+		return
 	}
+
+	maxId, err := interactor.IdCounterRepository.FindMaxIdByIdentifier("Users")
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+
+	newId := maxId + 1
+	_, err = interactor.IdCounterRepository.UpdateMaxIdByIdentifier("Users", newId)
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+
 	var userCreateParams = repository.UserCreateParams{
+		Id:       newId,
 		Email:    params.Email,
 		Password: fmt.Sprintf("%s", encryptedPassword),
 	}
@@ -46,7 +62,7 @@ func (interactor *UserInteractor) Create(params UserInteractorCreateParams) (boo
 }
 
 func (interactor *UserInteractor) Login(params UserInteractorCreateParams) (model.User, error) {
-	user, err := interactor.UserRepository.FindBy("email", params.Email)
+	user, err := interactor.UserRepository.FindByEmail(params.Email)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return user, err
@@ -65,17 +81,18 @@ func (interactor *UserInteractor) Login(params UserInteractorCreateParams) (mode
 	return user, err
 }
 
-func (interactor *UserInteractor) Logout(authenticationToken string) error {
-	user, err := interactor.UserRepository.FindBy("authentication_token", authenticationToken)
+func (interactor *UserInteractor) Logout(authenticationToken string) (err error) {
+	user, err := interactor.UserRepository.FindByAuthenticationToken(authenticationToken)
 	if err != nil {
 		log.Printf("%s", err.Error())
-		return err
+		return
 	}
-	_, err = interactor.UserRepository.UpdateAttribute(user.Id, "authentication_token", "")
+	err = interactor.UserRepository.UpdateAttribute(user.Email, "AuthenticationToken", "-")
 	if err != nil {
 		log.Printf("%s", err.Error())
 	}
-	return err
+
+	return
 }
 
 func (interactor *UserInteractor) CheckAuthenticationToken(authenticationToken string) (model.User, error) {
@@ -91,13 +108,13 @@ func (interactor *UserInteractor) CheckAuthenticationToken(authenticationToken s
 
 func (interactor *UserInteractor) updateToken(user *model.User) error {
 	authenticationToken := interactor.generateToken()
-	_, err := interactor.UserRepository.UpdateAttribute(user.Id, "authentication_token", authenticationToken)
+	err := interactor.UserRepository.UpdateAttribute(user.Email, "AuthenticationToken", authenticationToken)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return err
 	}
 	expiredAt := time.Now().Add(6 * time.Hour).Format("2006-01-02 15-04-05")
-	_, err = interactor.UserRepository.UpdateAttribute(user.Id, "authentication_token_expired_at",
+	err = interactor.UserRepository.UpdateAttribute(user.Email, "authentication_token_expired_at",
 		expiredAt)
 	if err != nil {
 		log.Printf("%s", err.Error())

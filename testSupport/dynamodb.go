@@ -51,6 +51,22 @@ func SetupTestDynamoDb() (*dynamodb.DynamoDB, func()) {
 		}
 		_, _ = dynamoDbHandler.UpdateItem(updateInput)
 
+		updateInput = &dynamodb.UpdateItemInput{
+			ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+				":m": {
+					N: aws.String(strconv.Itoa(1)),
+				},
+			},
+			TableName: aws.String("IdCounter"),
+			Key: map[string]*dynamodb.AttributeValue{
+				"Identifier": {
+					S: aws.String("Users"),
+				},
+			},
+			UpdateExpression: aws.String("set MaxId = :m"),
+		}
+		_, _ = dynamoDbHandler.UpdateItem(updateInput)
+
 		userDeleteInput := &dynamodb.DeleteItemInput{
 			Key: map[string]*dynamodb.AttributeValue{
 				"Email": {
