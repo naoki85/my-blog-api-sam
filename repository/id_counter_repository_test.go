@@ -18,3 +18,18 @@ func TestShouldFindCountByIdentifier(t *testing.T) {
 		t.Fatalf("Expected count 5, but got: %d", count)
 	}
 }
+
+func TestShouldUpdateMaxIdByIdentifier(t *testing.T) {
+	dynamoDbHandler, _ := testSupport.NewDynamoDbHandler()
+	repo := IdCounterRepository{
+		DynamoDBHandler: dynamoDbHandler,
+	}
+	count, err := repo.UpdateMaxIdByIdentifier("RecommendedBooks", 6)
+	if err != nil {
+		t.Fatalf("Cannot get recommended_books: %s", err)
+	}
+	if count != 6 {
+		t.Fatalf("Expected count 6, but got: %d", count)
+	}
+	_, _ = repo.UpdateMaxIdByIdentifier("RecommendedBooks", 5)
+}
