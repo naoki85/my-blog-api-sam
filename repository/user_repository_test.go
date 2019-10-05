@@ -1,19 +1,17 @@
 package repository
 
 import (
-	"gopkg.in/DATA-DOG/go-sqlmock.v2"
+	"github.com/naoki85/my-blog-api-sam/testSupport"
 	"testing"
 )
 
 func TestShouldFindUserByEmail(t *testing.T) {
-	rows := sqlmock.NewRows([]string{"id", "email", "encrypted_password"}).
-		AddRow(1, "hoge@example.com", "encrypted_password")
-	mockSqlHandler, _ := NewMockSqlHandler()
-	mockSqlHandler.Mock.ExpectQuery("^SELECT (.+) FROM users .*").WillReturnRows(rows)
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
 	repo := UserRepository{
-		SqlHandler: mockSqlHandler,
+		DynamoDBHandler: dynamoDbHandler,
 	}
-	user, err := repo.FindBy("email", "hoge@example.com")
+	user, err := repo.FindByEmail("hoge@example.com")
 	if err != nil {
 		t.Fatalf("Could not find user: %s", err.Error())
 	}
@@ -23,50 +21,45 @@ func TestShouldFindUserByEmail(t *testing.T) {
 }
 
 func TestShouldFindUserByAuthenticationToken(t *testing.T) {
-	rows := sqlmock.NewRows([]string{"id"}).AddRow(1)
-	mockSqlHandler, _ := NewMockSqlHandler()
-	mockSqlHandler.Mock.ExpectQuery("^SELECT (.+) FROM users .*").WillReturnRows(rows)
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
 	repo := UserRepository{
-		SqlHandler: mockSqlHandler,
+		DynamoDBHandler: dynamoDbHandler,
 	}
-	user, err := repo.FindByAuthenticationToken("hoge@example.com")
+	user, err := repo.FindByAuthenticationToken("Q1LZlKFt2h0000001vER4TjyFo7")
 	if err != nil {
 		t.Fatalf("Could not find user: %s", err.Error())
 	}
 	if user.Id != 1 {
-		t.Fatalf("Fail expected id: 1, got: %s", user.Email)
+		t.Fatalf("Fail expected id: 1, got: %d", user.Id)
 	}
 }
 
 func TestShouldUpdateAttribute(t *testing.T) {
-	mockSqlHandler, _ := NewMockSqlHandler()
-	mockSqlHandler.Mock.ExpectExec("UPDATE users SET").
-		WillReturnResult(sqlmock.NewResult(1, 1))
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
 	repo := UserRepository{
-		SqlHandler: mockSqlHandler,
+		DynamoDBHandler: dynamoDbHandler,
 	}
-	_, err := repo.UpdateAttribute(1, "authorization_token", "hogehoge")
+	_, err := repo.UpdateAttribute("hoge@example.com", "AuthenticationToken", "hogehoge")
 	if err != nil {
 		t.Fatalf("Could not update: %s", err.Error())
 	}
 }
 
 func TestShouldCreateUser(t *testing.T) {
-	mockSqlHandler, _ := NewMockSqlHandler()
-	mockSqlHandler.Mock.ExpectExec("INSERT INTO users").
-		WillReturnResult(sqlmock.NewResult(1, 1))
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
 	repo := UserRepository{
-		SqlHandler: mockSqlHandler,
+		DynamoDBHandler: dynamoDbHandler,
 	}
 	params := UserCreateParams{
+		Id:       2,
 		Email:    "test@example.com",
 		Password: "password",
 	}
-	_, err := repo.Create(params)
+	err := repo.Create(params)
 	if err != nil {
 		t.Fatalf("Cannot create user: %s", err)
-	}
-	if err := mockSqlHandler.Mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }

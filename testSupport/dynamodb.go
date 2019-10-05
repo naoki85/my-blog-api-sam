@@ -5,22 +5,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"log"
 	"os"
 	"strconv"
 )
-
-func NewDynamoDbHandler() (*dynamodb.DynamoDB, error) {
-	dynamoSession, err := session.NewSession(&aws.Config{
-		Credentials: credentials.NewStaticCredentials("hogehoge", "fugafuga", ""),
-		Region:      aws.String("ap-northeast-1"),
-		Endpoint:    aws.String("http://localhost:3307"),
-	})
-	if err != nil {
-		log.Printf("%s", err.Error())
-	}
-	return dynamodb.New(dynamoSession), err
-}
 
 func SetupTestDynamoDb() (*dynamodb.DynamoDB, func()) {
 	endpoint := os.Getenv("DYNAMODB_ENDPOINT")
@@ -63,5 +50,31 @@ func SetupTestDynamoDb() (*dynamodb.DynamoDB, func()) {
 			UpdateExpression: aws.String("set MaxId = :m"),
 		}
 		_, _ = dynamoDbHandler.UpdateItem(updateInput)
+
+		userDeleteInput := &dynamodb.DeleteItemInput{
+			Key: map[string]*dynamodb.AttributeValue{
+				"Email": {
+					S: aws.String("test@example.com"),
+				},
+			},
+			TableName: aws.String("Users"),
+		}
+		_, _ = dynamoDbHandler.DeleteItem(userDeleteInput)
+
+		userUpdateInput := &dynamodb.UpdateItemInput{
+			ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+				":a": {
+					S: aws.String("Q1LZlKFt2h0000001vER4TjyFo7"),
+				},
+			},
+			TableName: aws.String("Users"),
+			Key: map[string]*dynamodb.AttributeValue{
+				"Email": {
+					S: aws.String("hoge@example.com"),
+				},
+			},
+			UpdateExpression: aws.String("set AuthenticationToken = :a"),
+		}
+		_, _ = dynamoDbHandler.UpdateItem(userUpdateInput)
 	}
 }

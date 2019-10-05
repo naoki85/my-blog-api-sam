@@ -3,17 +3,40 @@
     {
       "AttributeName": "AuthenticationToken",
       "AttributeType": "S"
+    },
+    {
+      "AttributeName": "Email",
+      "AttributeType": "S"
     }
   ],
   "TableName": "Users",
   "KeySchema": [
     {
-      "AttributeName": "AuthenticationToken",
+      "AttributeName": "Email",
       "KeyType": "HASH"
     }
   ],
   "ProvisionedThroughput": {
     "ReadCapacityUnits": 1,
     "WriteCapacityUnits": 1
-  }
+  },
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "AuthenticationTokenIndex",
+      "KeySchema": [
+        {
+          "AttributeName": "AuthenticationToken",
+          "KeyType": "HASH"
+        }
+      ],
+      "Projection": {
+        "NonKeyAttributes": ["Id", "EncryptedPassword"],
+        "ProjectionType": "INCLUDE"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 1,
+        "WriteCapacityUnits": 1
+      }
+    }
+  ]
 }
