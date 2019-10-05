@@ -1,16 +1,16 @@
 package repository
 
 import (
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/naoki85/my-blog-api-sam/testSupport"
-	"gopkg.in/DATA-DOG/go-sqlmock.v2"
+	"log"
 	"testing"
 )
 
 func TestShouldFindAllRecommendedBooks(t *testing.T) {
 	dynamoDbHandler, _ := testSupport.NewDynamoDbHandler()
-	mockSqlHandler, _ := NewMockSqlHandler()
 	repo := RecommendedBookRepository{
-		SqlHandler:      mockSqlHandler,
 		DynamoDBHandler: dynamoDbHandler,
 	}
 	recommendedBooks, err := repo.All()
@@ -23,22 +23,34 @@ func TestShouldFindAllRecommendedBooks(t *testing.T) {
 }
 
 func TestShouldCreateRecommendedBook(t *testing.T) {
-	mockSqlHandler, _ := NewMockSqlHandler()
-	mockSqlHandler.Mock.ExpectExec("INSERT INTO recommended_books").
-		WillReturnResult(sqlmock.NewResult(1, 1))
+	dynamoDbHandler, _ := testSupport.NewDynamoDbHandler()
 	repo := RecommendedBookRepository{
-		SqlHandler: mockSqlHandler,
+		DynamoDBHandler: dynamoDbHandler,
 	}
 	params := RecommendedBookCreateParams{
+		Id:        6,
 		Link:      "http://test.example.com/hoge",
 		ImageUrl:  "http://test.example.com/hoge.png",
 		ButtonUrl: "http://test.example.com/hoge.png",
 	}
 	err := repo.Create(params)
+	log.Println(err)
 	if err != nil {
 		t.Fatalf("Cannot create recommended_book: %s", err)
 	}
-	if err := mockSqlHandler.Mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
+
+	input := &dynamodb.DeleteItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"Id": {
+				N: aws.String("6"),
+			},
+		},
+		TableName: aws.String("RecommendedBooks"),
+	}
+
+	_, err = dynamoDbHandler.DeleteItem(input)
+	if err != nil {
+		t.Fatal("Got error calling DeleteItem")
+		t.Fatal(err.Error())
 	}
 }
