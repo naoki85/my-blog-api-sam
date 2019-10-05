@@ -1,5 +1,28 @@
 version: '3'
 services:
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/api/Dockerfile
+#    command: sh /app/docker/api/test.sh
+    volumes:
+      - $PWD/docker/api/test.sh:/app/docker/api/test.sh
+    environment:
+      AWS_ACCESS_KEY_ID: hogehoge
+      AWS_SECRET_ACCESS_KEY: fugafuga
+      USERNAME: root
+      PASSWORD: root
+      HOST: mysqlDb
+      PORT: 3306
+      DBNAME: book_recorder_test
+      DYNAMODB_ENDPOINT: http://dynamodb:8000
+      RECOMMENDED_BOOKS_TABLE_NAME: RecommendedBooks
+      ID_COUNTER_TABLE_NAME: IdCounter
+    depends_on:
+      - dynamodb
+      - db
+    networks:
+      - lambda-local
   db:
     container_name: mysqlDb
     build:

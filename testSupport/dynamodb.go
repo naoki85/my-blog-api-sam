@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"log"
+	"os"
 	"strconv"
 )
 
@@ -22,10 +23,14 @@ func NewDynamoDbHandler() (*dynamodb.DynamoDB, error) {
 }
 
 func SetupTestDynamoDb() (*dynamodb.DynamoDB, func()) {
+	endpoint := os.Getenv("DYNAMODB_ENDPOINT")
+	if endpoint == "" {
+		endpoint = "http://localhost:3307"
+	}
 	dynamoSession, err := session.NewSession(&aws.Config{
 		Credentials: credentials.NewStaticCredentials("hogehoge", "fugafuga", ""),
 		Region:      aws.String("ap-northeast-1"),
-		Endpoint:    aws.String("http://localhost:3307"),
+		Endpoint:    aws.String(endpoint),
 	})
 	if err != nil {
 		panic(err.Error())
