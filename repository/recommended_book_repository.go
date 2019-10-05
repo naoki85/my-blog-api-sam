@@ -11,11 +11,11 @@ import (
 )
 
 type RecommendedBookRepository struct {
-	SqlHandler
 	DynamoDBHandler *dynamodb.DynamoDB
 }
 
 type RecommendedBookCreateParams struct {
+	Id        int
 	Link      string
 	ImageUrl  string
 	ButtonUrl string
@@ -53,13 +53,42 @@ func (repo *RecommendedBookRepository) All() (recommendedBooks model.Recommended
 	return
 }
 
-func (repo *RecommendedBookRepository) Create(params RecommendedBookCreateParams) error {
-	query := "INSERT INTO recommended_books (link, image_url, button_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?)"
+func (repo *RecommendedBookRepository) Create(params RecommendedBookCreateParams) (err error) {
+	type Item struct {
+		Id        int
+		Link      string
+		ImageUrl  string
+		ButtonUrl string
+		CreatedAt string
+		UpdatedAt string
+	}
 	now := time.Now().Format("2006-01-02 15-04-05")
-	_, err := repo.SqlHandler.Execute(query, params.Link, params.ImageUrl, params.ButtonUrl, now, now)
+
+	item := Item{
+		Id:        params.Id,
+		Link:      params.Link,
+		ImageUrl:  params.ImageUrl,
+		ButtonUrl: params.ButtonUrl,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+	av, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {
-		log.Printf("%s", err.Error())
-		return err
+		log.Println("Got error marshalling new movie item:")
+		log.Println(err.Error())
+		return
+	}
+
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String(repo.tableName()),
+	}
+
+	_, err = repo.DynamoDBHandler.PutItem(input)
+	if err != nil {
+		log.Println("Got error calling PutItem:")
+		log.Println(err.Error())
+		return
 	}
 
 	return nil

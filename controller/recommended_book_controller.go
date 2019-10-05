@@ -14,12 +14,10 @@ type RecommendedBookController struct {
 	Interactor usecase.RecommendedBookInteractor
 }
 
-func NewRecommendedBookController(sqlHandler repository.SqlHandler,
-	dynamoDbHandler *dynamodb.DynamoDB) *RecommendedBookController {
+func NewRecommendedBookController(dynamoDbHandler *dynamodb.DynamoDB) *RecommendedBookController {
 	return &RecommendedBookController{
 		Interactor: usecase.RecommendedBookInteractor{
 			RecommendedBookRepository: &repository.RecommendedBookRepository{
-				SqlHandler:      sqlHandler,
 				DynamoDBHandler: dynamoDbHandler,
 			},
 			IdCounterRepository: &repository.IdCounterRepository{

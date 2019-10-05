@@ -24,7 +24,7 @@ func (interactor *RecommendedBookInteractor) All(limit int) (recommendedBooks mo
 		return
 	}
 
-	count, err := interactor.IdCounterRepository.FindCountByIdentifier("RecommendedBooks")
+	count, err := interactor.IdCounterRepository.FindMaxIdByIdentifier("RecommendedBooks")
 	if err != nil {
 		log.Fatalln(err.Error())
 		return
@@ -45,12 +45,26 @@ func (interactor *RecommendedBookInteractor) All(limit int) (recommendedBooks mo
 	return
 }
 
-func (interactor *RecommendedBookInteractor) Create(params RecommendedBookInteractorCreateParams) error {
+func (interactor *RecommendedBookInteractor) Create(params RecommendedBookInteractorCreateParams) (err error) {
+	maxId, err := interactor.IdCounterRepository.FindMaxIdByIdentifier("RecommendedBooks")
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+
+	newId := maxId + 1
+	_, err = interactor.IdCounterRepository.UpdateMaxIdByIdentifier("RecommendedBooks", newId)
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+
 	var inputParams = repository.RecommendedBookCreateParams{
+		Id:        newId,
 		Link:      params.Link,
 		ImageUrl:  params.ImageUrl,
 		ButtonUrl: params.ButtonUrl,
 	}
-	err := interactor.RecommendedBookRepository.Create(inputParams)
+	err = interactor.RecommendedBookRepository.Create(inputParams)
 	return err
 }

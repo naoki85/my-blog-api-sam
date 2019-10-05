@@ -6,6 +6,7 @@ import (
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/infrastructure"
 	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/testSupport"
 	"strings"
 	"testing"
 
@@ -26,6 +27,36 @@ func TestRecommendedBooksHandler(t *testing.T) {
 		_, err := handler(events.APIGatewayProxyRequest{Path: "/recommended_books"})
 		if err != nil {
 			t.Fatal("Everything should be ok")
+		}
+	})
+}
+
+func TestCreateRecommendedBookHandler(t *testing.T) {
+	_, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
+
+	t.Run("Successful Request", func(t *testing.T) {
+		authToken := testLogin()
+		res, _ := handler(events.APIGatewayProxyRequest{
+			HTTPMethod: "POST",
+			Path:       "/recommended_books",
+			Headers:    map[string]string{"Authorization": fmt.Sprintf("Bearer %s", authToken)},
+			Body:       `{"link":"http://test.example.com","image_url":"http://test.example.com","button_url":"http://test.example.com"}`,
+		})
+		if res.StatusCode != config.SuccessStatus {
+			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
+		}
+	})
+
+	t.Run("Unauthorized", func(t *testing.T) {
+		res, _ := handler(events.APIGatewayProxyRequest{
+			HTTPMethod: "POST",
+			Path:       "/recommended_books",
+			Headers:    map[string]string{"Authorization": "Bearer hogehoge"},
+			Body:       `{"link":"http://test.example.com","image_url":"http://test.example.com","button_url":"http://test.example.com"}`,
+		})
+		if res.StatusCode != config.UnauthorizedStatus {
+			t.Fatalf("Expected status: 401, but got %v", res.StatusCode)
 		}
 	})
 }
@@ -66,42 +97,12 @@ func TestPostHandler(t *testing.T) {
 	})
 }
 
-func TestCreateRecommendedBookHandler(t *testing.T) {
-	_, teardown := SetupTest()
-	defer teardown()
-
-	t.Run("Successful Request", func(t *testing.T) {
-		authToken := testLogin()
-		res, _ := handler(events.APIGatewayProxyRequest{
-			HTTPMethod: "POST",
-			Path:       "/recommended_books",
-			Headers:    map[string]string{"Authorization": fmt.Sprintf("Bearer %s", authToken)},
-			Body:       `{"link":"http://test.example.com","image_url":"http://test.example.com","button_url":"http://test.example.com"}`,
-		})
-		if res.StatusCode != config.SuccessStatus {
-			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
-		}
-	})
-
-	t.Run("Unauthorized", func(t *testing.T) {
-		res, _ := handler(events.APIGatewayProxyRequest{
-			HTTPMethod: "POST",
-			Path:       "/recommended_books",
-			Headers:    map[string]string{"Authorization": "Bearer hogehoge"},
-			Body:       `{"link":"http://test.example.com","image_url":"http://test.example.com","button_url":"http://test.example.com"}`,
-		})
-		if res.StatusCode != config.UnauthorizedStatus {
-			t.Fatalf("Expected status: 401, but got %v", res.StatusCode)
-		}
-	})
-}
-
 func TestCreateUserHandler(t *testing.T) {
 	t.Run("Successful Request", func(t *testing.T) {
 		res, _ := createUser(events.APIGatewayProxyRequest{
 			HTTPMethod: "POST",
 			Path:       "/users",
-			Body:       `{"email":"hoge@example.com","password":"hogehoge"}`,
+			Body:       `{"email":"hogehoge@example.com","password":"hogehoge"}`,
 		})
 		if res.StatusCode != config.SuccessStatus {
 			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)

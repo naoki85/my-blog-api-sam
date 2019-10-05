@@ -60,9 +60,8 @@ func requireLogin(f func(events.APIGatewayProxyRequest) (events.APIGatewayProxyR
 func recommendedBooks() (events.APIGatewayProxyResponse, error) {
 	config.InitDbConf("")
 	c := config.GetDbConf()
-	sqlHandler, _ := infrastructure.NewSqlHandler(c)
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
-	testController := controller.NewRecommendedBookController(sqlHandler, dynamoDbHandler)
+	testController := controller.NewRecommendedBookController(dynamoDbHandler)
 	recommendedBooks, status := testController.Index()
 
 	if status != config.SuccessStatus {
@@ -82,9 +81,8 @@ func createRecommendedBook(request events.APIGatewayProxyRequest) (events.APIGat
 
 	config.InitDbConf("")
 	c := config.GetDbConf()
-	sqlHandler, _ := infrastructure.NewSqlHandler(c)
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
-	testController := controller.NewRecommendedBookController(sqlHandler, dynamoDbHandler)
+	testController := controller.NewRecommendedBookController(dynamoDbHandler)
 	recommendedBooks, status := testController.Create(params)
 
 	if status != config.SuccessStatus {
