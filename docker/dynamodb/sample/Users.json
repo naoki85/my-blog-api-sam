@@ -30,7 +30,7 @@
         }
       ],
       "Projection": {
-        "NonKeyAttributes": ["Id", "EncryptedPassword"],
+        "NonKeyAttributes": ["Id", "EncryptedPassword", "AuthenticationTokenExpiredAt"],
         "ProjectionType": "INCLUDE"
       },
       "ProvisionedThroughput": {

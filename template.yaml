@@ -165,6 +165,7 @@ Resources:
             NonKeyAttributes:
               - "Id"
               - "EncryptedPassword"
+              - "AuthenticationTokenExpiredAt"
             ProjectionType: "INCLUDE"
           ProvisionedThroughput:
             ReadCapacityUnits: 1

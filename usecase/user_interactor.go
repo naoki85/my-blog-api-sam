@@ -103,6 +103,16 @@ func (interactor *UserInteractor) CheckAuthenticationToken(authenticationToken s
 	if user.Id == 0 {
 		err = errors.New("not found")
 	}
+	layout := "2006-01-02 15-04-05"
+	t, err := time.Parse(layout, user.AuthenticationTokenExpiredAt)
+	if err != nil {
+		log.Println(err.Error())
+		return user, err
+	}
+	now := time.Now()
+	if now.After(t) {
+		err = errors.New("not found")
+	}
 	return user, err
 }
 
@@ -114,7 +124,7 @@ func (interactor *UserInteractor) updateToken(user *model.User) error {
 		return err
 	}
 	expiredAt := time.Now().Add(6 * time.Hour).Format("2006-01-02 15-04-05")
-	err = interactor.UserRepository.UpdateAttribute(user.Email, "authentication_token_expired_at",
+	err = interactor.UserRepository.UpdateAttribute(user.Email, "AuthenticationTokenExpiredAt",
 		expiredAt)
 	if err != nil {
 		log.Printf("%s", err.Error())

@@ -13,8 +13,8 @@ type RecommendedBookInteractor struct {
 
 type RecommendedBookInteractorCreateParams struct {
 	Link      string `json:"link"`
-	ImageUrl  string `json:"image_url"`
-	ButtonUrl string `json:"button_url"`
+	ImageUrl  string `json:"imageUrl"`
+	ButtonUrl string `json:"buttonUrl"`
 }
 
 func (interactor *RecommendedBookInteractor) All(limit int) (recommendedBooks model.RecommendedBooks, err error) {

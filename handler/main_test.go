@@ -41,7 +41,7 @@ func TestCreateRecommendedBookHandler(t *testing.T) {
 			HTTPMethod: "POST",
 			Path:       "/recommended_books",
 			Headers:    map[string]string{"Authorization": fmt.Sprintf("Bearer %s", authToken)},
-			Body:       `{"link":"http://test.example.com","image_url":"http://test.example.com","button_url":"http://test.example.com"}`,
+			Body:       `{"link":"http://test.example.com","imageUrl":"http://test.example.com","buttonUrl":"http://test.example.com"}`,
 		})
 		if res.StatusCode != config.SuccessStatus {
 			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
@@ -53,7 +53,7 @@ func TestCreateRecommendedBookHandler(t *testing.T) {
 			HTTPMethod: "POST",
 			Path:       "/recommended_books",
 			Headers:    map[string]string{"Authorization": "Bearer hogehoge"},
-			Body:       `{"link":"http://test.example.com","image_url":"http://test.example.com","button_url":"http://test.example.com"}`,
+			Body:       `{"link":"http://test.example.com","imageUrl":"http://test.example.com","buttonUrl":"http://test.example.com"}`,
 		})
 		if res.StatusCode != config.UnauthorizedStatus {
 			t.Fatalf("Expected status: 401, but got %v", res.StatusCode)
