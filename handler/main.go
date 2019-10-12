@@ -17,7 +17,7 @@ import (
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if request.Path == "/health" {
-		return health(request)
+		return health()
 	} else if request.Path == "/recommended_books" {
 		if request.HTTPMethod == "POST" {
 			return requireLogin(createRecommendedBook, request)
@@ -194,7 +194,7 @@ func logout(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespon
 	return apiResponse(fmt.Sprintf("%s", res), status), nil
 }
 
-func health(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func health() (events.APIGatewayProxyResponse, error) {
 	return apiResponse("success", config.SuccessStatus), nil
 }
 
