@@ -18,12 +18,20 @@ services:
       DYNAMODB_ENDPOINT: http://dynamodb:8000
       RECOMMENDED_BOOKS_TABLE_NAME: RecommendedBooks
       ID_COUNTER_TABLE_NAME: IdCounter
+    networks:
+      - lambda-local
     depends_on:
       - dynamodb
-      - db
   dynamodb:
     image: amazon/dynamodb-local
     container_name: dynamoDb
     command: -jar DynamoDBLocal.jar -dbPath /data
+    ports:
+      - 3307:8000
+    networks:
+      - lambda-local
     volumes:
       - $PWD/docker/dynamodb/data:/data
+networks:
+  lambda-local:
+    external: true

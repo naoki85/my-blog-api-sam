@@ -129,15 +129,30 @@ Resources:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
   PostsDynamoDBTable:
-    Type: AWS::Serverless::SimpleTable
-    TableName: "Posts"
+    Type: AWS::DynamoDB::Table
     Properties:
-      PrimaryKey:
-        Name: Id
-        Type: Number
+      TableName: "Posts"
+      AttributeDefinitions:
+        - AttributeName: "Id"
+          AttributeType: "N"
+        - AttributeName: "Category"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Id"
+          KeyType: "HASH"
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
+      GlobalSecondaryIndexes:
+        - IndexName: "CategorySearchIndex"
+          KeySchema:
+            - AttributeName: "Category"
+              KeyType: "HASH"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
   IdCounterDynamoDBTable:
     Type: AWS::Serverless::SimpleTable
     TableName: "IdCounter"
