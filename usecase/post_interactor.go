@@ -30,6 +30,11 @@ func (interactor *PostInteractor) Index(page int) (posts model.Posts, count int,
 		if t.After(now) {
 			continue
 		}
+		if post.ImageUrl == "" {
+			post.ImageUrl = "https://s3-ap-northeast-1.amazonaws.com/bookrecorder-image/commons/default_user_icon.png"
+		} else {
+			post.ImageUrl = "http://d29xhtkvbwm2ne.cloudfront.net/" + post.ImageUrl
+		}
 		retPosts = append(retPosts, post)
 	}
 	count = len(retPosts) / 10
