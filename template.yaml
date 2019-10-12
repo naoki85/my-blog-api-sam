@@ -35,6 +35,7 @@ Globals:
         DBNAME: dbname
         TZ: Asia/Tokyo
         DYNAMODB_ENDPOINT: ""
+        POSTS_TABLE_NAME: Posts
         RECOMMENDED_BOOKS_TABLE_NAME: RecommendedBooks
         ID_COUNTER_TABLE_NAME: IdCounter
   Api:
@@ -102,6 +103,7 @@ Resources:
           TZ: Asia/Tokyo
           DYNAMODB_ENDPOINT: ""
           RECOMMENDED_BOOKS_TABLE_NAME: !Ref RecommendedBooksDynamoDBTable
+          POSTS_TABLE_NAME: !Ref PostsDynamoDBTable
           ID_COUNTER_TABLE_NAME: !Ref IdCounterDynamoDBTable
           USERS_TABLE_NAME: !Ref UsersDynamoDBTable
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
@@ -119,6 +121,16 @@ Resources:
   RecommendedBooksDynamoDBTable:
     Type: AWS::Serverless::SimpleTable
     TableName: "RecommendedBooks"
+    Properties:
+      PrimaryKey:
+        Name: Id
+        Type: Number
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+  PostsDynamoDBTable:
+    Type: AWS::Serverless::SimpleTable
+    TableName: "Posts"
     Properties:
       PrimaryKey:
         Name: Id
