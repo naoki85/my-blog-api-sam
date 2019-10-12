@@ -21,25 +21,9 @@ services:
     depends_on:
       - dynamodb
       - db
-  db:
-    container_name: mysqlDb
-    build:
-      context: .
-      dockerfile: ./docker/db/Dockerfile
-    volumes:
-      - bookrecorder-mysql-data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: test
-      MYSQL_PASSWORD: testpassword
-      TZ: 'Asia/Tokyo'
   dynamodb:
     image: amazon/dynamodb-local
     container_name: dynamoDb
     command: -jar DynamoDBLocal.jar -dbPath /data
     volumes:
       - $PWD/docker/dynamodb/data:/data
-volumes:
-  bookrecorder-mysql-data:
-    external:
-      name: bookrecorder-mysql-data

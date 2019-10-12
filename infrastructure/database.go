@@ -5,7 +5,6 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/naoki85/my-blog-api-sam/config"
-	"github.com/naoki85/my-blog-api-sam/repository"
 	"log"
 )
 
@@ -13,7 +12,7 @@ type SqlHandler struct {
 	Conn *sql.DB
 }
 
-func NewSqlHandler(c *config.Config) (repository.SqlHandler, error) {
+func NewSqlHandler(c *config.Config) (*SqlHandler, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&loc=Local",
 		c.Username, c.Password, c.Host, c.Port, c.Database)
 	conn, err := sql.Open("mysql", dsn)
@@ -26,7 +25,7 @@ func NewSqlHandler(c *config.Config) (repository.SqlHandler, error) {
 	return sqlHandler, err
 }
 
-func (handler *SqlHandler) Execute(statement string, args ...interface{}) (repository.Result, error) {
+func (handler *SqlHandler) Execute(statement string, args ...interface{}) (SqlResult, error) {
 	res := SqlResult{}
 	result, err := handler.Conn.Exec(statement, args...)
 	if err != nil {
@@ -37,7 +36,7 @@ func (handler *SqlHandler) Execute(statement string, args ...interface{}) (repos
 	return res, err
 }
 
-func (handler *SqlHandler) Query(statement string, args ...interface{}) (repository.Row, error) {
+func (handler *SqlHandler) Query(statement string, args ...interface{}) (*SqlRow, error) {
 	rows, err := handler.Conn.Query(statement, args...)
 	if err != nil {
 		log.Printf("%s", err.Error())
