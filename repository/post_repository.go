@@ -1,76 +1,88 @@
 package repository
 
 import (
+	"encoding/json"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/naoki85/my-blog-api-sam/model"
 	"log"
-	"time"
+	"os"
+	"strconv"
 )
 
 type PostRepository struct {
-	SqlHandler
+	DynamoDBHandler *dynamodb.DynamoDB
 }
 
-func (repo *PostRepository) Index(page int) (posts model.Posts, err error) {
-	query := "SELECT id, post_category_id, title, image_file_name, published_at FROM posts WHERE active = 1 AND published_at <= ? ORDER BY published_at DESC"
-	query = query + " LIMIT 10 OFFSET ?"
-	offset := 10 * (page - 1)
-	nowTime := time.Now()
-	rows, err := repo.SqlHandler.Query(query, nowTime, offset)
-	defer rows.Close()
+func (repo *PostRepository) tableName() (tableName string) {
+	if tableName = os.Getenv("POSTS_TABLE_NAME"); tableName != "" {
+		return tableName
+	} else {
+		return "Posts"
+	}
+}
+
+func (repo *PostRepository) All() (posts model.Posts, count int, err error) {
+	result, err := repo.DynamoDBHandler.Scan(&dynamodb.ScanInput{
+		TableName:            aws.String(repo.tableName()),
+		ProjectionExpression: aws.String("Id, Category, Title, Content, ImageUrl, PublishedAt"),
+	})
 
 	if err != nil {
-		log.Printf("%s", err.Error())
-		return posts, err
+		log.Printf("dynamodbErr: %s", err.Error())
+		return
 	}
 
-	for rows.Next() {
+	for _, i := range result.Items {
 		p := model.Post{}
-		err := rows.Scan(&p.Id, &p.PostCategoryId, &p.Title, &p.ImageUrl, &p.PublishedAt)
+		err = dynamodbattribute.UnmarshalMap(i, &p)
 		if err != nil {
-			log.Printf("%s", err.Error())
-			return posts, err
+			log.Println("Got error unmarshalling:")
+			log.Println(err.Error())
+			return
 		}
-
 		posts = append(posts, p)
 	}
+
+	var postsCount struct {
+		Count int
+	}
+	res2json, err := json.Marshal(result)
+	if err != nil {
+		log.Println("Got error marshalling:")
+		log.Println(err.Error())
+	}
+	err = json.Unmarshal(res2json, &postsCount)
+	if err != nil {
+		log.Println("Got error unmarshalling:")
+		log.Println(err.Error())
+	}
+	count = postsCount.Count
+
 	return
 }
 
 func (repo *PostRepository) FindById(id int) (post model.Post, err error) {
-	nowTime := time.Now()
-	query := "SELECT id, post_category_id, title, content, image_file_name, published_at FROM posts WHERE id = ? AND active = 1 AND published_at <= ? LIMIT 1"
-	rows, err := repo.SqlHandler.Query(query, id, nowTime)
-	if err != nil {
-		log.Printf("%s", err.Error())
-		return post, err
+	input := &dynamodb.GetItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"Id": {
+				N: aws.String(strconv.Itoa(id)),
+			},
+		},
+		TableName: aws.String(repo.tableName()),
 	}
 
-	for rows.Next() {
-		err := rows.Scan(&post.Id, &post.PostCategoryId, &post.Title, &post.Content, &post.ImageUrl, &post.PublishedAt)
-		if err != nil {
-			log.Printf("%s", err.Error())
-			return post, err
-		}
-		break
-	}
-	return
-}
-
-func (repo *PostRepository) GetPostsCount() (count int, err error) {
-	nowTime := time.Now()
-	query := "SELECT COUNT(*) FROM posts WHERE active = 1 AND published_at <= ? LIMIT 1"
-	rows, err := repo.SqlHandler.Query(query, nowTime)
+	result, err := repo.DynamoDBHandler.GetItem(input)
 	if err != nil {
-		log.Printf("%s", err.Error())
-		return 0, err
+		log.Printf("dynamodbErr: %s", err.Error())
+		return
 	}
-	for rows.Next() {
-		err := rows.Scan(&count)
-		if err != nil {
-			log.Printf("%s", err.Error())
-			return 0, err
-		}
-		break
+
+	err = dynamodbattribute.UnmarshalMap(result.Item, &post)
+	if err != nil {
+		log.Printf("Could not unmarshal map: %s", err.Error())
+		return
 	}
 	return
 }

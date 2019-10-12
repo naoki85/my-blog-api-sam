@@ -1,0 +1,18 @@
+{
+  "Posts": [
+    {
+      "PutRequest": {
+        "Item": {
+          "Id": { "N": "1" },
+          "Category": { "S": "aws" },
+          "Title": { "S": "Test" },
+          "Content": { "S": "test" },
+          "ImageUrl": { "S": "test.com" },
+          "PublishedAt": { "S": "2019-02-20 21:56:36" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    }
+  ]
+}
