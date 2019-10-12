@@ -100,9 +100,9 @@ func posts(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 
 	config.InitDbConf("")
 	c := config.GetDbConf()
-	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	testController := controller.NewPostController(sqlHandler)
-	resp, status := testController.Index(page)
+	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
+	postController := controller.NewPostController(dynamoDbHandler)
+	resp, status := postController.Index(page)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
@@ -126,10 +126,10 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 
 	config.InitDbConf("")
 	c := config.GetDbConf()
-	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	testController := controller.NewPostController(sqlHandler)
+	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
+	postController := controller.NewPostController(dynamoDbHandler)
 
-	post, status := testController.Show(postId, format)
+	post, status := postController.Show(postId, format)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
