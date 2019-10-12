@@ -1,0 +1,41 @@
+{
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "Id",
+      "AttributeType": "N"
+    },
+    {
+      "AttributeName": "Category",
+      "AttributeType": "S"
+    }
+  ],
+  "TableName": "Posts",
+  "KeySchema": [
+    {
+      "AttributeName": "Id",
+      "KeyType": "HASH"
+    }
+  ],
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 1,
+    "WriteCapacityUnits": 1
+  },
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "CategorySearchIndex",
+      "KeySchema": [
+        {
+          "AttributeName": "Category",
+          "KeyType": "HASH"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 1,
+        "WriteCapacityUnits": 1
+      }
+    }
+  ]
+}

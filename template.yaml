@@ -35,6 +35,7 @@ Globals:
         DBNAME: dbname
         TZ: Asia/Tokyo
         DYNAMODB_ENDPOINT: ""
+        POSTS_TABLE_NAME: Posts
         RECOMMENDED_BOOKS_TABLE_NAME: RecommendedBooks
         ID_COUNTER_TABLE_NAME: IdCounter
   Api:
@@ -102,6 +103,7 @@ Resources:
           TZ: Asia/Tokyo
           DYNAMODB_ENDPOINT: ""
           RECOMMENDED_BOOKS_TABLE_NAME: !Ref RecommendedBooksDynamoDBTable
+          POSTS_TABLE_NAME: !Ref PostsDynamoDBTable
           ID_COUNTER_TABLE_NAME: !Ref IdCounterDynamoDBTable
           USERS_TABLE_NAME: !Ref UsersDynamoDBTable
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
@@ -126,6 +128,31 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
+  PostsDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "Posts"
+      AttributeDefinitions:
+        - AttributeName: "Id"
+          AttributeType: "N"
+        - AttributeName: "Category"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      GlobalSecondaryIndexes:
+        - IndexName: "CategorySearchIndex"
+          KeySchema:
+            - AttributeName: "Category"
+              KeyType: "HASH"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
   IdCounterDynamoDBTable:
     Type: AWS::Serverless::SimpleTable
     TableName: "IdCounter"
@@ -139,7 +166,7 @@ Resources:
   UsersDynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: "Users"
+      TableName: "Users20191010"
       AttributeDefinitions:
         -
           AttributeName: "AuthenticationToken"

@@ -8,24 +8,22 @@ import (
 type MockPostRepository struct {
 }
 
-func (repo *MockPostRepository) All(int) (model.Posts, error) {
+func (repo *MockPostRepository) All() (model.Posts, int, error) {
 	posts := model.Posts{
-		model.Post{Id: 1},
-		model.Post{Id: 2},
-		model.Post{Id: 3},
-		model.Post{Id: 4},
+		model.Post{Id: 1, PublishedAt: "2019-01-01 00:00:00"},
+		model.Post{Id: 2, PublishedAt: "2019-02-01 00:00:00"},
+		model.Post{Id: 3, PublishedAt: "2019-03-01 00:00:00"},
+		model.Post{Id: 4, PublishedAt: "2019-03-01 00:00:00"},
+		model.Post{Id: 5, PublishedAt: "2019-03-01 00:00:00"},
+		model.Post{Id: 6, PublishedAt: "2019-03-01 00:00:00"},
+		model.Post{Id: 7, PublishedAt: "2019-03-01 00:00:00"},
+		model.Post{Id: 8, PublishedAt: "2019-03-01 00:00:00"},
+		model.Post{Id: 9, PublishedAt: "2019-03-01 00:00:00"},
+		model.Post{Id: 10, PublishedAt: "2019-03-01 00:00:00"},
+		model.Post{Id: 11, PublishedAt: "2019-03-01 00:00:00"},
+		model.Post{Id: 11, PublishedAt: "2021-01-01 00:00:00"},
 	}
-	return posts, nil
-}
-
-func (repo *MockPostRepository) Index(int) (model.Posts, error) {
-	posts := model.Posts{
-		model.Post{Id: 1, PostCategoryId: 1},
-		model.Post{Id: 2, PostCategoryId: 1},
-		model.Post{Id: 3, PostCategoryId: 1},
-		model.Post{Id: 4, PostCategoryId: 1},
-	}
-	return posts, nil
+	return posts, 11, nil
 }
 
 func (repo *MockPostRepository) FindById(int) (model.Post, error) {
@@ -35,26 +33,37 @@ func (repo *MockPostRepository) FindById(int) (model.Post, error) {
 	return post, nil
 }
 
-func (repo *MockPostRepository) GetPostsCount() (int, error) {
-	return 10, nil
+type MockIdCounterRepository struct{}
+
+func (repo *MockIdCounterRepository) FindMaxIdByIdentifier(i string) (int, error) {
+	return 1, nil
+}
+
+func (repo *MockIdCounterRepository) UpdateMaxIdByIdentifier(i string, n int) (int, error) {
+	return 1, nil
 }
 
 func TestShouldPostsIndex(t *testing.T) {
-	interactor := initInteractor()
-	posts, err := interactor.Index(1)
+	interactor := initTestPostInteractor()
+	posts, count, err := interactor.Index(1)
 	if err != nil {
 		t.Fatalf("Cannot get recommended_books: %s", err)
 	}
-	if len(posts) != 4 {
-		t.Fatalf("Fail expected: 4, got: %v", len(posts))
+	if len(posts) != 10 {
+		t.Fatalf("Fail expected: 10, got: %v", len(posts))
 	}
-	if posts[0].PostCategory.Name != "AWS" {
-		t.Fatalf("Fail expected: AWS, got: %v", posts[0].PostCategory.Name)
+	if count != 2 {
+		t.Fatalf("Fail expected: 2, got: %d", count)
+	}
+
+	posts2, _, _ := interactor.Index(2)
+	if len(posts2) != 1 {
+		t.Fatalf("Fail expected: 1, got: %d", len(posts2))
 	}
 }
 
 func TestShouldFindPostById(t *testing.T) {
-	interactor := initInteractor()
+	interactor := initTestPostInteractor()
 	post, err := interactor.FindById(1)
 	if err != nil {
 		t.Fatalf("Cannot get recommended_books: %s", err)
@@ -64,20 +73,9 @@ func TestShouldFindPostById(t *testing.T) {
 	}
 }
 
-func TestShouldGetPostsCount(t *testing.T) {
-	interactor := initInteractor()
-	count, err := interactor.GetPostsCount()
-	if err != nil {
-		t.Fatalf("Cannot get recommended_books: %s", err)
-	}
-	if count != 10 {
-		t.Fatalf("Fail expected count: 10, got: %v", count)
-	}
-}
-
-func initInteractor() PostInteractor {
+func initTestPostInteractor() PostInteractor {
 	return PostInteractor{
-		PostRepository:         new(MockPostRepository),
-		PostCategoryRepository: new(MockPostCategoryRepository),
+		PostRepository:      new(MockPostRepository),
+		IdCounterRepository: new(MockIdCounterRepository),
 	}
 }

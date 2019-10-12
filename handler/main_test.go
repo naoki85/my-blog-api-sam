@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/naoki85/my-blog-api-sam/config"
-	"github.com/naoki85/my-blog-api-sam/infrastructure"
 	"github.com/naoki85/my-blog-api-sam/model"
 	"github.com/naoki85/my-blog-api-sam/testSupport"
 	"strings"
@@ -12,6 +11,17 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 )
+
+func TestHealthHandler(t *testing.T) {
+	t.Run("Successful Request", func(t *testing.T) {
+		res, _ := handler(events.APIGatewayProxyRequest{
+			Path: "/health",
+		})
+		if res.StatusCode != config.SuccessStatus {
+			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
+		}
+	})
+}
 
 func TestHandler(t *testing.T) {
 	t.Run("posts", func(t *testing.T) {
@@ -111,8 +121,6 @@ func TestCreateUserHandler(t *testing.T) {
 }
 
 func TestLoginAndLogoutHandler(t *testing.T) {
-	_, teardown := SetupTest()
-	defer teardown()
 	_, _ = createUser(events.APIGatewayProxyRequest{
 		Body: `{"email":"hoge@example.com","password":"hogehoge"}`,
 	})
@@ -149,18 +157,6 @@ func TestLoginAndLogoutHandler(t *testing.T) {
 	})
 }
 
-func TestHealthHandler(t *testing.T) {
-	_, teardown := SetupTest()
-	defer teardown()
-
-	t.Run("Successful Request", func(t *testing.T) {
-		res, _ := health(events.APIGatewayProxyRequest{})
-		if res.StatusCode != config.SuccessStatus {
-			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
-		}
-	})
-}
-
 func testLogin() string {
 	_, _ = createUser(events.APIGatewayProxyRequest{
 		Body: `{"email":"hoge@example.com","password":"hogehoge"}`,
@@ -171,17 +167,4 @@ func testLogin() string {
 		Body:       `{"email":"hoge@example.com","password":"hogehoge"}`,
 	})
 	return res.Body
-}
-
-func SetupTest() (bool, func()) {
-	config.InitDbConf("")
-	c := config.GetDbConf()
-	sqlHandler, err := infrastructure.NewSqlHandler(c)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return true, func() {
-		_, _ = sqlHandler.Execute("DELETE FROM users")
-	}
 }

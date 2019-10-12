@@ -5,18 +5,16 @@ import (
 	"fmt"
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/model"
-	"github.com/naoki85/my-blog-api-sam/repository"
+	"github.com/naoki85/my-blog-api-sam/testSupport"
 	"strings"
 	"testing"
 )
 
 func TestShouldGetPostsForIndex(t *testing.T) {
-	// TODO: 複数クエリをモックにするならもはや DB 用意した方が良さそう
-	mockSqlHandler, _ := repository.NewMockSqlHandler()
-	mockSqlHandler.ResistMockForPostsIndex("^SELECT (.+) FROM posts .*", []string{"id", "post_category_id", "title", "image_file_name", "published_at"})
-	mockSqlHandler.ResistMockForPostCategory("^SELECT (.+) FROM post_categories (.+)", []string{"id", "name", "color"})
-	mockSqlHandler.ResistMockForPostCount("^SELECT COUNT(.+) FROM posts .*", []string{"count"})
-	controller := NewPostController(mockSqlHandler)
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
+
+	controller := NewPostController(dynamoDbHandler)
 	posts, status := controller.Index(1)
 	if status != config.SuccessStatus {
 		t.Fatalf("Should get 200 status, but got: %d", status)
@@ -29,17 +27,17 @@ func TestShouldGetPostsForIndex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Response could not pasred: %s", err.Error())
 	}
-	if res.TotalPage != 7 {
-		t.Fatalf("Fail expected length: 4, got: %v", res)
+	if res.TotalPage != 1 {
+		t.Fatalf("Fail expected length: 1, got: %v", res)
 	}
 }
 
 func TestShouldGetPostsForShow(t *testing.T) {
-	mockSqlHandler, _ := repository.NewMockSqlHandler()
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
 
 	t.Run("format json", func(t *testing.T) {
-		mockSqlHandler.ResistMockForPost("^SELECT (.+) FROM posts .*", []string{"id", "post_category_id", "title", "content", "image_file_name", "published_at"})
-		controller := NewPostController(mockSqlHandler)
+		controller := NewPostController(dynamoDbHandler)
 		post, status := controller.Show(1, "json")
 		if status != config.SuccessStatus {
 			t.Fatalf("Should get 200 status, but got: %d", status)
@@ -55,15 +53,14 @@ func TestShouldGetPostsForShow(t *testing.T) {
 	})
 
 	t.Run("format html", func(t *testing.T) {
-		mockSqlHandler.ResistMockForPost("^SELECT (.+) FROM posts .*", []string{"id", "post_category_id", "title", "content", "image_file_name", "published_at"})
-		controller := NewPostController(mockSqlHandler)
+		controller := NewPostController(dynamoDbHandler)
 		res, status := controller.Show(1, "html")
 		if status != config.SuccessStatus {
 			t.Fatalf("Should get 200 status, but got: %d", status)
 		}
 		res2Html := fmt.Sprintf("%s", res)
 
-		if strings.Contains(res2Html, `<meta property="og:title" content="test title 1">`) == false {
+		if strings.Contains(res2Html, `<meta property="og:title" content="Test">`) == false {
 			t.Fatalf("Not match expected strings: %s", res2Html)
 		}
 	})

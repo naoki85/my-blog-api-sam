@@ -11,9 +11,8 @@
 Start Mysql container.
 
 ```shell
-docker volume create bookrecorder-mysql-data
 docker network create lambda-local
-docker-compose up db
+docker-compose up dynamodb
 ```
 
 ### Building
@@ -73,7 +72,7 @@ aws cloudformation describe-stacks \
 First, check status of docker db.
 
 ```shell
-docker-compose -f docker-compose.yml -f docker-compose.development.yml up -d db dynamodb
+docker-compose -f docker-compose.yml -f docker-compose.development.yml up -d dynamodb
 ```
 And, execute all tests.
 

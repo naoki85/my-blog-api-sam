@@ -17,7 +17,7 @@ import (
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if request.Path == "/health" {
-		return health(request)
+		return health()
 	} else if request.Path == "/recommended_books" {
 		if request.HTTPMethod == "POST" {
 			return requireLogin(createRecommendedBook, request)
@@ -100,9 +100,9 @@ func posts(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 
 	config.InitDbConf("")
 	c := config.GetDbConf()
-	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	testController := controller.NewPostController(sqlHandler)
-	resp, status := testController.Index(page)
+	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
+	postController := controller.NewPostController(dynamoDbHandler)
+	resp, status := postController.Index(page)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
@@ -126,10 +126,10 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 
 	config.InitDbConf("")
 	c := config.GetDbConf()
-	sqlHandler, _ := infrastructure.NewSqlHandler(c)
-	testController := controller.NewPostController(sqlHandler)
+	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
+	postController := controller.NewPostController(dynamoDbHandler)
 
-	post, status := testController.Show(postId, format)
+	post, status := postController.Show(postId, format)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
@@ -194,7 +194,7 @@ func logout(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespon
 	return apiResponse(fmt.Sprintf("%s", res), status), nil
 }
 
-func health(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func health() (events.APIGatewayProxyResponse, error) {
 	return apiResponse("success", config.SuccessStatus), nil
 }
 

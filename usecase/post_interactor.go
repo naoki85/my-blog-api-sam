@@ -2,46 +2,63 @@ package usecase
 
 import (
 	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/util"
 	"log"
-	"strings"
+	"sort"
+	"time"
 )
 
 type PostInteractor struct {
-	PostRepository         PostRepository
-	PostCategoryRepository PostCategoryRepository
+	PostRepository      PostRepository
+	IdCounterRepository IdCounterRepository
 }
 
-func (interactor *PostInteractor) Index(page int) (model.Posts, error) {
-	posts, err := interactor.PostRepository.Index(page)
+func (interactor *PostInteractor) Index(page int) (posts model.Posts, count int, err error) {
+	posts, count, err = interactor.PostRepository.All()
+	if err != nil {
+		log.Printf("%s", err.Error())
+	}
 	var retPosts model.Posts
+	layout := "2006-01-02 15:04:05"
+	now := time.Now()
 	for _, post := range posts {
-		postCategory, err := interactor.PostCategoryRepository.FindById(post.PostCategoryId)
+		t, err := time.Parse(layout, post.PublishedAt)
 		if err != nil {
 			log.Printf("%s", err.Error())
 			continue
 		}
-		post.PostCategory = postCategory
+		if t.After(now) {
+			continue
+		}
+		if post.ImageUrl == "" {
+			post.ImageUrl = "https://s3-ap-northeast-1.amazonaws.com/bookrecorder-image/commons/default_user_icon.png"
+		} else {
+			post.ImageUrl = "http://d29xhtkvbwm2ne.cloudfront.net/" + post.ImageUrl
+		}
 		retPosts = append(retPosts, post)
 	}
-	return retPosts, err
+	count = len(retPosts) / 10
+	if len(retPosts)%10 != 0 {
+		count++
+	}
+
+	sort.Slice(retPosts, func(i, j int) bool { return retPosts[i].Id > retPosts[j].Id })
+	start := util.CompareInt("max", (page-1)*10, 0)
+	end := util.CompareInt("min", page*10, len(retPosts))
+
+	var ret []model.Post
+	ret = retPosts[start:end]
+
+	return ret, count, nil
 }
 
-func (interactor *PostInteractor) FindById(id int) (model.Post, error) {
-	post, err := interactor.PostRepository.FindById(id)
+func (interactor *PostInteractor) FindById(id int) (post model.Post, err error) {
+	post, err = interactor.PostRepository.FindById(id)
 	if err != nil {
 		log.Printf("%s", err.Error())
-		return post, err
+		return
 	}
-	post.PublishedAt = strings.Split(post.PublishedAt, "T")[0]
 	post.ImageUrl = "http://d29xhtkvbwm2ne.cloudfront.net/" + post.ImageUrl
-	return post, err
-}
 
-func (interactor *PostInteractor) GetPostsCount() (int, error) {
-	count, err := interactor.PostRepository.GetPostsCount()
-	if err != nil {
-		log.Printf("%s", err.Error())
-		return count, err
-	}
-	return count, err
+	return
 }

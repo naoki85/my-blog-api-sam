@@ -3,4 +3,3 @@ env.production.json
 handler/handler
 packaged.yaml
 docker/dynamodb/data/*
-!docker/dynamodb/data/hogehoge_ap-northeast-1.db
