@@ -25,6 +25,16 @@ func SetupTestDynamoDb() (*dynamodb.DynamoDB, func()) {
 	dynamoDbHandler := dynamodb.New(dynamoSession)
 
 	return dynamoDbHandler, func() {
+		deletePostInput := &dynamodb.DeleteItemInput{
+			Key: map[string]*dynamodb.AttributeValue{
+				"Id": {
+					N: aws.String("2"),
+				},
+			},
+			TableName: aws.String("Posts"),
+		}
+		_, _ = dynamoDbHandler.DeleteItem(deletePostInput)
+
 		deleteInput := &dynamodb.DeleteItemInput{
 			Key: map[string]*dynamodb.AttributeValue{
 				"Id": {

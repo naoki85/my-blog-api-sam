@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 )
 
 type PostRepository struct {
@@ -21,6 +22,16 @@ func (repo *PostRepository) tableName() (tableName string) {
 	} else {
 		return "Posts"
 	}
+}
+
+type PostCreateParams struct {
+	Id          int
+	UserId      int
+	Category    string
+	Title       string
+	Content     string
+	Active      string
+	PublishedAt string
 }
 
 func (repo *PostRepository) All() (posts model.Posts, count int, err error) {
@@ -85,4 +96,51 @@ func (repo *PostRepository) FindById(id int) (post model.Post, err error) {
 		return
 	}
 	return
+}
+
+func (repo *PostRepository) Create(params PostCreateParams) (err error) {
+	type Item struct {
+		Id          int
+		UserId      int
+		Category    string
+		Title       string
+		Content     string
+		Active      string
+		PublishedAt string
+		CreatedAt   string
+		UpdatedAt   string
+	}
+	now := time.Now().Format("2006-01-02 15-04-05")
+
+	item := Item{
+		Id:          params.Id,
+		UserId:      params.UserId,
+		Category:    params.Category,
+		Title:       params.Title,
+		Content:     params.Content,
+		Active:      params.Active,
+		PublishedAt: params.PublishedAt,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}
+	av, err := dynamodbattribute.MarshalMap(item)
+	if err != nil {
+		log.Println("Got error marshalling new movie item:")
+		log.Println(err.Error())
+		return
+	}
+
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: aws.String(repo.tableName()),
+	}
+
+	_, err = repo.DynamoDBHandler.PutItem(input)
+	if err != nil {
+		log.Println("Got error calling PutItem:")
+		log.Println(err.Error())
+		return
+	}
+
+	return nil
 }
