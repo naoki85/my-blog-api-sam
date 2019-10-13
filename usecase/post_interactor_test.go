@@ -2,6 +2,8 @@ package usecase
 
 import (
 	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/repository"
+	"github.com/naoki85/my-blog-api-sam/testSupport"
 	"testing"
 )
 
@@ -31,6 +33,10 @@ func (repo *MockPostRepository) FindById(int) (model.Post, error) {
 		Id: 1,
 	}
 	return post, nil
+}
+
+func (repo *MockPostRepository) Create(params repository.PostCreateParams) error {
+	return nil
 }
 
 type MockIdCounterRepository struct{}
@@ -80,6 +86,32 @@ func TestShouldFindPostById(t *testing.T) {
 	}
 	if post.Id != 1 {
 		t.Fatalf("Fail expected id: 1, got: %v", post)
+	}
+}
+
+func TestShouldCreatePost(t *testing.T) {
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
+	interactor := PostInteractor{
+		PostRepository: &repository.PostRepository{
+			DynamoDBHandler: dynamoDbHandler,
+		},
+		IdCounterRepository: &repository.IdCounterRepository{
+			DynamoDBHandler: dynamoDbHandler,
+		},
+	}
+
+	params := PostInteractorCreateParams{
+		Category:    "aws",
+		Title:       "Test title",
+		Content:     "Test content",
+		Active:      "published",
+		PublishedAt: "2019-10-01 00:00:00",
+	}
+
+	err := interactor.Create(params)
+	if err != nil {
+		t.Fatalf("Could not create recommended book: %s", err.Error())
 	}
 }
 

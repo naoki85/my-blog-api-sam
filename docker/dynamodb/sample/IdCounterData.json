@@ -3,6 +3,14 @@
     {
       "PutRequest": {
         "Item": {
+          "Identifier": { "S": "Posts" },
+          "MaxId": { "N": "1" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
           "Identifier": { "S": "RecommendedBooks" },
           "MaxId": { "N": "5" }
         }

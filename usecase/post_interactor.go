@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/repository"
 	"github.com/naoki85/my-blog-api-sam/util"
 	"log"
 	"sort"
@@ -11,6 +12,14 @@ import (
 type PostInteractor struct {
 	PostRepository      PostRepository
 	IdCounterRepository IdCounterRepository
+}
+
+type PostInteractorCreateParams struct {
+	Category    string `json:"category"`
+	Title       string `json:"title"`
+	Content     string `json:"content"`
+	Active      string `json:"active"`
+	PublishedAt string `json:"publishedAt"`
 }
 
 func (interactor *PostInteractor) Index(page int, all bool) (posts model.Posts, count int, err error) {
@@ -63,4 +72,31 @@ func (interactor *PostInteractor) FindById(id int) (post model.Post, err error) 
 	post.ImageUrl = "http://d29xhtkvbwm2ne.cloudfront.net/" + post.ImageUrl
 
 	return
+}
+
+func (interactor *PostInteractor) Create(params PostInteractorCreateParams) (err error) {
+	maxId, err := interactor.IdCounterRepository.FindMaxIdByIdentifier("Posts")
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+
+	newId := maxId + 1
+	_, err = interactor.IdCounterRepository.UpdateMaxIdByIdentifier("Posts", newId)
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+
+	var inputParams = repository.PostCreateParams{
+		Id:          newId,
+		UserId:      1,
+		Category:    params.Category,
+		Title:       params.Title,
+		Content:     params.Content,
+		Active:      params.Active,
+		PublishedAt: params.PublishedAt,
+	}
+	err = interactor.PostRepository.Create(inputParams)
+	return err
 }
