@@ -42,17 +42,6 @@ First and foremost, we need a `S3 bucket` where we can upload our Lambda functio
 ```bash
 aws s3 mb s3://BUCKET_NAME
 ```
-
-After create S3 bucket, Set following environment variables.
-
-```bash
-export USERNAME='username'
-export PASSWORD='password'
-export HOST='host'
-export PORT='port'
-export DBNAME='dbname'
-```
-
 And run `deploy.sh` . This script executes package and deploy.
 
 ```bash

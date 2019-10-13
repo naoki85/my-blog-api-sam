@@ -5,34 +5,12 @@ Description: >
   
   Sample SAM Template for my-blog-api-sam
 
-Parameters:
-  UserName:
-    Type: String
-    Default: ""
-  Password:
-    Type: String
-    Default: ""
-  Host:
-    Type: String
-    Default: ""
-  Port:
-    Type: String
-    Default: "3306"
-  DbName:
-    Type: String
-    Default: ""
-
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 5
     Environment:
       Variables:
-        USERNAME: username
-        PASSWORD: password
-        HOST: host
-        PORT: port
-        DBNAME: dbname
         TZ: Asia/Tokyo
         DYNAMODB_ENDPOINT: ""
         POSTS_TABLE_NAME: Posts
@@ -100,11 +78,6 @@ Resources:
             Method: DELETE
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
-          USERNAME: !Ref UserName
-          PASSWORD: !Ref Password
-          HOST: !Ref Host
-          PORT: !Ref Port
-          DBNAME: !Ref DbName
           TZ: Asia/Tokyo
           DYNAMODB_ENDPOINT: ""
           RECOMMENDED_BOOKS_TABLE_NAME: !Ref RecommendedBooksDynamoDBTable
@@ -112,9 +85,6 @@ Resources:
           ID_COUNTER_TABLE_NAME: !Ref IdCounterDynamoDBTable
           USERS_TABLE_NAME: !Ref UsersDynamoDBTable
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
-      VpcConfig:
-        SecurityGroupIds: ["sg-0351ecbd14859fcfe"]
-        SubnetIds: ["subnet-3b290b13"]
   ServerlessRestApi:
     Type: AWS::Serverless::Api
     Properties:
