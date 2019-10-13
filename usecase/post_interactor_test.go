@@ -21,7 +21,7 @@ func (repo *MockPostRepository) All() (model.Posts, int, error) {
 		model.Post{Id: 9, PublishedAt: "2019-03-01 00:00:00"},
 		model.Post{Id: 10, PublishedAt: "2019-03-01 00:00:00"},
 		model.Post{Id: 11, PublishedAt: "2019-03-01 00:00:00"},
-		model.Post{Id: 11, PublishedAt: "2021-01-01 00:00:00"},
+		model.Post{Id: 12, PublishedAt: "2021-01-01 00:00:00"},
 	}
 	return posts, 11, nil
 }
@@ -45,28 +45,38 @@ func (repo *MockIdCounterRepository) UpdateMaxIdByIdentifier(i string, n int) (i
 
 func TestShouldPostsIndex(t *testing.T) {
 	interactor := initTestPostInteractor()
-	posts, count, err := interactor.Index(1)
-	if err != nil {
-		t.Fatalf("Cannot get recommended_books: %s", err)
-	}
-	if len(posts) != 10 {
-		t.Fatalf("Fail expected: 10, got: %v", len(posts))
-	}
-	if count != 2 {
-		t.Fatalf("Fail expected: 2, got: %d", count)
-	}
 
-	posts2, _, _ := interactor.Index(2)
-	if len(posts2) != 1 {
-		t.Fatalf("Fail expected: 1, got: %d", len(posts2))
-	}
+	t.Run("Successful Request", func(t *testing.T) {
+		posts, count, err := interactor.Index(1, false)
+		if err != nil {
+			t.Fatalf("Cannot get post: %s", err)
+		}
+		if len(posts) != 10 {
+			t.Fatalf("Fail expected: 10, got: %v", len(posts))
+		}
+		if count != 2 {
+			t.Fatalf("Fail expected: 2, got: %d", count)
+		}
+
+		posts2, _, _ := interactor.Index(2, false)
+		if len(posts2) != 1 {
+			t.Fatalf("Fail expected: 1, got: %d", len(posts2))
+		}
+	})
+
+	t.Run("Admin request", func(t *testing.T) {
+		posts, _, _ := interactor.Index(2, true)
+		if len(posts) != 2 {
+			t.Fatalf("Fail expected: 2, got: %d", len(posts))
+		}
+	})
 }
 
 func TestShouldFindPostById(t *testing.T) {
 	interactor := initTestPostInteractor()
 	post, err := interactor.FindById(1)
 	if err != nil {
-		t.Fatalf("Cannot get recommended_books: %s", err)
+		t.Fatalf("Cannot get post: %s", err)
 	}
 	if post.Id != 1 {
 		t.Fatalf("Fail expected id: 1, got: %v", post)

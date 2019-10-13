@@ -101,8 +101,20 @@ func posts(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
+
+	var all bool
+	header := request.Headers["Authorization"]
+	if header == "" {
+		all = false
+	} else {
+		authenticationToken := strings.Split(header, " ")[1]
+		userController := controller.NewUserController(dynamoDbHandler)
+		_, status := userController.LoginStatus(authenticationToken)
+		all = status == config.SuccessStatus
+	}
+
 	postController := controller.NewPostController(dynamoDbHandler)
-	resp, status := postController.Index(page)
+	resp, status := postController.Index(page, all)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}

@@ -13,7 +13,7 @@ type PostInteractor struct {
 	IdCounterRepository IdCounterRepository
 }
 
-func (interactor *PostInteractor) Index(page int) (posts model.Posts, count int, err error) {
+func (interactor *PostInteractor) Index(page int, all bool) (posts model.Posts, count int, err error) {
 	posts, count, err = interactor.PostRepository.All()
 	if err != nil {
 		log.Printf("%s", err.Error())
@@ -22,15 +22,17 @@ func (interactor *PostInteractor) Index(page int) (posts model.Posts, count int,
 	layout := "2006-01-02 15:04:05"
 	now := time.Now()
 	for _, post := range posts {
-		t, err := time.Parse(layout, post.PublishedAt)
-		if err != nil {
-			log.Printf("%s", err.Error())
-			continue
+		if !all {
+			t, err := time.Parse(layout, post.PublishedAt)
+			if err != nil {
+				log.Printf("%s", err.Error())
+				continue
+			}
+			if t.After(now) {
+				continue
+			}
 		}
-		if t.After(now) {
-			continue
-		}
-		if post.ImageUrl == "" {
+		if post.ImageUrl == "-" {
 			post.ImageUrl = "https://s3-ap-northeast-1.amazonaws.com/bookrecorder-image/commons/default_user_icon.png"
 		} else {
 			post.ImageUrl = "http://d29xhtkvbwm2ne.cloudfront.net/" + post.ImageUrl

@@ -15,7 +15,7 @@ func TestShouldGetPostsForIndex(t *testing.T) {
 	defer tearDown()
 
 	controller := NewPostController(dynamoDbHandler)
-	posts, status := controller.Index(1)
+	posts, status := controller.Index(1, false)
 	if status != config.SuccessStatus {
 		t.Fatalf("Should get 200 status, but got: %d", status)
 	}

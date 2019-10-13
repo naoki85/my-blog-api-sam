@@ -72,7 +72,7 @@ aws cloudformation describe-stacks \
 First, check status of docker db.
 
 ```shell
-docker-compose -f docker-compose.yml -f docker-compose.development.yml up -d dynamodb
+docker-compose up -d dynamodb
 ```
 And, execute all tests.
 
