@@ -78,6 +78,11 @@ Resources:
           Properties:
             Path: /posts/{id}
             Method: GET
+        PostsCreateApi:
+          Type: Api
+          Properties:
+            Path: /posts
+            Method: POST
         UsersCreateApi:
           Type: Api
           Properties:

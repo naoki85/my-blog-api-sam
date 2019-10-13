@@ -107,6 +107,24 @@ func TestPostHandler(t *testing.T) {
 	})
 }
 
+func TestCreatePostHandler(t *testing.T) {
+	_, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
+
+	t.Run("Successful Request", func(t *testing.T) {
+		authToken := testLogin()
+		res, _ := handler(events.APIGatewayProxyRequest{
+			HTTPMethod: "POST",
+			Path:       "/posts",
+			Headers:    map[string]string{"Authorization": fmt.Sprintf("Bearer %s", authToken)},
+			Body:       `{"category":"aws","title":"test title","content":"test content","active":"published","publishedAt":"2019-10-01 00:00:00"}`,
+		})
+		if res.StatusCode != config.SuccessStatus {
+			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
+		}
+	})
+}
+
 func TestCreateUserHandler(t *testing.T) {
 	t.Run("Successful Request", func(t *testing.T) {
 		res, _ := createUser(events.APIGatewayProxyRequest{
