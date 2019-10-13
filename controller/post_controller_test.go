@@ -76,6 +76,7 @@ func TestShouldCreatePost(t *testing.T) {
 		Category:    "aws",
 		Title:       "Test title",
 		Content:     "Test content",
+		ImageUrl:    "test.com",
 		Active:      "published",
 		PublishedAt: "2019-10-01 00:00:00",
 	}

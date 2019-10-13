@@ -18,6 +18,7 @@ type PostInteractorCreateParams struct {
 	Category    string `json:"category"`
 	Title       string `json:"title"`
 	Content     string `json:"content"`
+	ImageUrl    string `json:"imageUrl"`
 	Active      string `json:"active"`
 	PublishedAt string `json:"publishedAt"`
 }
@@ -94,6 +95,7 @@ func (interactor *PostInteractor) Create(params PostInteractorCreateParams) (err
 		Category:    params.Category,
 		Title:       params.Title,
 		Content:     params.Content,
+		ImageUrl:    params.ImageUrl,
 		Active:      params.Active,
 		PublishedAt: params.PublishedAt,
 	}

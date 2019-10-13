@@ -117,7 +117,7 @@ func TestCreatePostHandler(t *testing.T) {
 			HTTPMethod: "POST",
 			Path:       "/posts",
 			Headers:    map[string]string{"Authorization": fmt.Sprintf("Bearer %s", authToken)},
-			Body:       `{"category":"aws","title":"test title","content":"test content","active":"published","publishedAt":"2019-10-01 00:00:00"}`,
+			Body:       `{"category":"aws","title":"test title","content":"test content","imageUrl":"test.com","active":"published","publishedAt":"2019-10-01 00:00:00"}`,
 		})
 		if res.StatusCode != config.SuccessStatus {
 			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)

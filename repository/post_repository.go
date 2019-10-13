@@ -30,6 +30,7 @@ type PostCreateParams struct {
 	Category    string
 	Title       string
 	Content     string
+	ImageUrl    string
 	Active      string
 	PublishedAt string
 }
@@ -105,6 +106,7 @@ func (repo *PostRepository) Create(params PostCreateParams) (err error) {
 		Category    string
 		Title       string
 		Content     string
+		ImageUrl    string
 		Active      string
 		PublishedAt string
 		CreatedAt   string
@@ -118,6 +120,7 @@ func (repo *PostRepository) Create(params PostCreateParams) (err error) {
 		Category:    params.Category,
 		Title:       params.Title,
 		Content:     params.Content,
+		ImageUrl:    params.ImageUrl,
 		Active:      params.Active,
 		PublishedAt: params.PublishedAt,
 		CreatedAt:   now,
