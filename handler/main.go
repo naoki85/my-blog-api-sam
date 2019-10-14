@@ -25,7 +25,11 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 			return recommendedBooks()
 		}
 	} else if request.Path == "/posts" {
-		return posts(request)
+		if request.HTTPMethod == "POST" {
+			return requireLogin(createPost, request)
+		} else {
+			return posts(request)
+		}
 	} else if regexp.MustCompile(`^/posts/(\d+)`).MatchString(request.Path) {
 		return post(request)
 	} else if request.HTTPMethod == "POST" && request.Path == "/users" {
@@ -101,8 +105,20 @@ func posts(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 	config.InitDbConf("")
 	c := config.GetDbConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
+
+	var all bool
+	header := request.Headers["Authorization"]
+	if header == "" {
+		all = false
+	} else {
+		authenticationToken := strings.Split(header, " ")[1]
+		userController := controller.NewUserController(dynamoDbHandler)
+		_, status := userController.LoginStatus(authenticationToken)
+		all = status == config.SuccessStatus
+	}
+
 	postController := controller.NewPostController(dynamoDbHandler)
-	resp, status := postController.Index(page)
+	resp, status := postController.Index(page, all)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
@@ -139,6 +155,27 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 	} else {
 		return ogpResponse(fmt.Sprintf("%s", post), status), nil
 	}
+}
+
+func createPost(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	var params usecase.PostInteractorCreateParams
+	requestBody := []byte(request.Body)
+	err := json.Unmarshal(requestBody, &params)
+	if err != nil {
+		return handleError(400), nil
+	}
+
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
+	testController := controller.NewPostController(dynamoDbHandler)
+	recommendedBooks, status := testController.Create(params)
+
+	if status != config.SuccessStatus {
+		return handleError(status), nil
+	}
+
+	return apiResponse(fmt.Sprintf("%s", recommendedBooks), status), nil
 }
 
 func createUser(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {

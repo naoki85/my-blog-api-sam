@@ -40,3 +40,25 @@ func TestShouldFindPostById(t *testing.T) {
 		t.Fatalf("Fail expected: Test, got: %v", post.Title)
 	}
 }
+
+func TestShouldCreatePost(t *testing.T) {
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
+	repo := PostRepository{
+		DynamoDBHandler: dynamoDbHandler,
+	}
+	params := PostCreateParams{
+		Id:          2,
+		UserId:      1,
+		Category:    "aws",
+		Title:       "Test title",
+		Content:     "Test content",
+		ImageUrl:    "test.png",
+		Active:      "published",
+		PublishedAt: "2019-10-01 00:00:00",
+	}
+	err := repo.Create(params)
+	if err != nil {
+		t.Fatalf("Cannot create recommended_book: %s", err)
+	}
+}

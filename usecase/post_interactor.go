@@ -2,18 +2,31 @@ package usecase
 
 import (
 	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/repository"
 	"github.com/naoki85/my-blog-api-sam/util"
+	"io"
 	"log"
 	"sort"
 	"time"
 )
 
 type PostInteractor struct {
-	PostRepository      PostRepository
-	IdCounterRepository IdCounterRepository
+	PostRepository                PostRepository
+	IdCounterRepository           IdCounterRepository
+	S3BookrecorderImageRepository S3BookrecorderImageRepository
 }
 
-func (interactor *PostInteractor) Index(page int) (posts model.Posts, count int, err error) {
+type PostInteractorCreateParams struct {
+	Category    string `json:"category"`
+	Title       string `json:"title"`
+	Content     string `json:"content"`
+	ImageUrl    string `json:"imageUrl"`
+	Active      string `json:"active"`
+	PublishedAt string `json:"publishedAt"`
+	ImageBody   io.Reader
+}
+
+func (interactor *PostInteractor) Index(page int, all bool) (posts model.Posts, count int, err error) {
 	posts, count, err = interactor.PostRepository.All()
 	if err != nil {
 		log.Printf("%s", err.Error())
@@ -22,15 +35,17 @@ func (interactor *PostInteractor) Index(page int) (posts model.Posts, count int,
 	layout := "2006-01-02 15:04:05"
 	now := time.Now()
 	for _, post := range posts {
-		t, err := time.Parse(layout, post.PublishedAt)
-		if err != nil {
-			log.Printf("%s", err.Error())
-			continue
+		if !all {
+			t, err := time.Parse(layout, post.PublishedAt)
+			if err != nil {
+				log.Printf("%s", err.Error())
+				continue
+			}
+			if t.After(now) {
+				continue
+			}
 		}
-		if t.After(now) {
-			continue
-		}
-		if post.ImageUrl == "" {
+		if post.ImageUrl == "-" {
 			post.ImageUrl = "https://s3-ap-northeast-1.amazonaws.com/bookrecorder-image/commons/default_user_icon.png"
 		} else {
 			post.ImageUrl = "http://d29xhtkvbwm2ne.cloudfront.net/" + post.ImageUrl
@@ -61,4 +76,43 @@ func (interactor *PostInteractor) FindById(id int) (post model.Post, err error) 
 	post.ImageUrl = "http://d29xhtkvbwm2ne.cloudfront.net/" + post.ImageUrl
 
 	return
+}
+
+func (interactor *PostInteractor) Create(params PostInteractorCreateParams) (err error) {
+	maxId, err := interactor.IdCounterRepository.FindMaxIdByIdentifier("Posts")
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+
+	newId := maxId + 1
+	_, err = interactor.IdCounterRepository.UpdateMaxIdByIdentifier("Posts", newId)
+	if err != nil {
+		log.Fatalln(err.Error())
+		return
+	}
+
+	filename := params.ImageUrl
+	if filename != "-" {
+		filename = time.Now().Format("20060102150405") + params.ImageUrl
+
+		err = interactor.S3BookrecorderImageRepository.Create(filename, params.ImageBody)
+		if err != nil {
+			log.Fatalln(err.Error())
+			return
+		}
+	}
+
+	var inputParams = repository.PostCreateParams{
+		Id:          newId,
+		UserId:      1,
+		Category:    params.Category,
+		Title:       params.Title,
+		Content:     params.Content,
+		ImageUrl:    filename,
+		Active:      params.Active,
+		PublishedAt: params.PublishedAt,
+	}
+	err = interactor.PostRepository.Create(inputParams)
+	return err
 }

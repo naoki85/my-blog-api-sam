@@ -25,6 +25,16 @@ func SetupTestDynamoDb() (*dynamodb.DynamoDB, func()) {
 	dynamoDbHandler := dynamodb.New(dynamoSession)
 
 	return dynamoDbHandler, func() {
+		deletePostInput := &dynamodb.DeleteItemInput{
+			Key: map[string]*dynamodb.AttributeValue{
+				"Id": {
+					N: aws.String("2"),
+				},
+			},
+			TableName: aws.String("Posts"),
+		}
+		_, _ = dynamoDbHandler.DeleteItem(deletePostInput)
+
 		deleteInput := &dynamodb.DeleteItemInput{
 			Key: map[string]*dynamodb.AttributeValue{
 				"Id": {
@@ -36,6 +46,22 @@ func SetupTestDynamoDb() (*dynamodb.DynamoDB, func()) {
 		_, _ = dynamoDbHandler.DeleteItem(deleteInput)
 
 		updateInput := &dynamodb.UpdateItemInput{
+			ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+				":m": {
+					N: aws.String(strconv.Itoa(1)),
+				},
+			},
+			TableName: aws.String("IdCounter"),
+			Key: map[string]*dynamodb.AttributeValue{
+				"Identifier": {
+					S: aws.String("Posts"),
+				},
+			},
+			UpdateExpression: aws.String("set MaxId = :m"),
+		}
+		_, _ = dynamoDbHandler.UpdateItem(updateInput)
+
+		updateInput = &dynamodb.UpdateItemInput{
 			ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
 				":m": {
 					N: aws.String(strconv.Itoa(5)),

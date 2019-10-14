@@ -12,7 +12,7 @@ Start Mysql container.
 
 ```shell
 docker network create lambda-local
-docker-compose up dynamodb
+docker-compose up dynamodb localstack
 ```
 
 ### Building
@@ -42,17 +42,6 @@ First and foremost, we need a `S3 bucket` where we can upload our Lambda functio
 ```bash
 aws s3 mb s3://BUCKET_NAME
 ```
-
-After create S3 bucket, Set following environment variables.
-
-```bash
-export USERNAME='username'
-export PASSWORD='password'
-export HOST='host'
-export PORT='port'
-export DBNAME='dbname'
-```
-
 And run `deploy.sh` . This script executes package and deploy.
 
 ```bash
@@ -72,7 +61,7 @@ aws cloudformation describe-stacks \
 First, check status of docker db.
 
 ```shell
-docker-compose -f docker-compose.yml -f docker-compose.development.yml up -d dynamodb
+docker-compose up -d dynamodb
 ```
 And, execute all tests.
 
@@ -100,4 +89,13 @@ $ aws dynamodb batch-write-item --request-items file://docker/dynamodb/sample/da
 $ aws dynamodb scan --table-name TableName --endpoint-url http://127.0.0.1:3307 --region ap-northeast-1
 # Delete table
 $ aws dynamodb delete-table --table-name TableName --endpoint-url http://127.0.0.1:3307 --region ap-northeast-1
+```
+
+## S3 Tips
+
+### CLI
+
+```
+# Create bucket
+$ aws s3 --endpoint-url=http://localhost:9000 mb s3://test-bucket --profile=localstack
 ```

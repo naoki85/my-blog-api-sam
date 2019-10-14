@@ -6,6 +6,7 @@ import (
 	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/model"
 	"github.com/naoki85/my-blog-api-sam/testSupport"
+	"github.com/naoki85/my-blog-api-sam/usecase"
 	"strings"
 	"testing"
 )
@@ -15,7 +16,7 @@ func TestShouldGetPostsForIndex(t *testing.T) {
 	defer tearDown()
 
 	controller := NewPostController(dynamoDbHandler)
-	posts, status := controller.Index(1)
+	posts, status := controller.Index(1, false)
 	if status != config.SuccessStatus {
 		t.Fatalf("Should get 200 status, but got: %d", status)
 	}
@@ -64,4 +65,24 @@ func TestShouldGetPostsForShow(t *testing.T) {
 			t.Fatalf("Not match expected strings: %s", res2Html)
 		}
 	})
+}
+
+func TestShouldCreatePost(t *testing.T) {
+	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
+	defer tearDown()
+	controller := NewPostController(dynamoDbHandler)
+
+	params := usecase.PostInteractorCreateParams{
+		Category:    "aws",
+		Title:       "Test title",
+		Content:     "Test content",
+		ImageUrl:    "test.com",
+		Active:      "published",
+		PublishedAt: "2019-10-01 00:00:00",
+	}
+
+	_, status := controller.Create(params)
+	if status != config.SuccessStatus {
+		t.Fatalf("Should get 200 status, but got: %d", status)
+	}
 }

@@ -28,8 +28,8 @@ func NewPostController(dynamoDbHandler *dynamodb.DynamoDB) *PostController {
 	}
 }
 
-func (controller *PostController) Index(page int) ([]byte, int) {
-	posts, count, err := controller.Interactor.Index(page)
+func (controller *PostController) Index(page int, all bool) ([]byte, int) {
+	posts, count, err := controller.Interactor.Index(page, all)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return []byte{}, config.NotFoundStatus
@@ -50,8 +50,12 @@ func (controller *PostController) Index(page int) ([]byte, int) {
 
 func (controller *PostController) Show(id int, format string) ([]byte, int) {
 	post, err := controller.Interactor.FindById(id)
-	if err != nil || post.Id == 0 {
+	if err != nil {
 		log.Printf("%s", err.Error())
+		return []byte{}, config.NotFoundStatus
+	}
+	if post.Id == 0 {
+		log.Println("post is not found")
 		return []byte{}, config.NotFoundStatus
 	}
 
@@ -68,6 +72,24 @@ func (controller *PostController) Show(id int, format string) ([]byte, int) {
 		return resp, config.InternalServerErrorStatus
 	}
 
+	return resp, config.SuccessStatus
+}
+
+func (controller *PostController) Create(params usecase.PostInteractorCreateParams) ([]byte, int) {
+	err := controller.Interactor.Create(params)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return []byte{}, config.InvalidParameterStatus
+	}
+
+	data := struct {
+		Message string
+	}{"success"}
+	resp, err := json.Marshal(data)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return resp, config.InternalServerErrorStatus
+	}
 	return resp, config.SuccessStatus
 }
 

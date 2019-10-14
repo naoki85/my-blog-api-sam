@@ -33,9 +33,4 @@ sam deploy \
     --stack-name my-blog-api-sam \
     --capabilities CAPABILITY_IAM \
     --parameter-overrides \
-        USERNAME=${USERNAME} \
-        PASSWORD=${PASSWORD} \
-        HOST=${HOST} \
-        PORT=${PORT} \
-        DBNAME=${DBNAME} \
         TZ='Asia/Tokyo'
