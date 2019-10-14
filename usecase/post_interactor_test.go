@@ -3,7 +3,7 @@ package usecase
 import (
 	"github.com/naoki85/my-blog-api-sam/model"
 	"github.com/naoki85/my-blog-api-sam/repository"
-	"github.com/naoki85/my-blog-api-sam/testSupport"
+	"io"
 	"testing"
 )
 
@@ -49,6 +49,12 @@ func (repo *MockIdCounterRepository) UpdateMaxIdByIdentifier(i string, n int) (i
 	return 1, nil
 }
 
+type MockS3BookrecorderImageRepository struct{}
+
+func (repo *MockS3BookrecorderImageRepository) Create(f string, b io.Reader) error {
+	return nil
+}
+
 func TestShouldPostsIndex(t *testing.T) {
 	interactor := initTestPostInteractor()
 
@@ -90,17 +96,7 @@ func TestShouldFindPostById(t *testing.T) {
 }
 
 func TestShouldCreatePost(t *testing.T) {
-	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
-	defer tearDown()
-	interactor := PostInteractor{
-		PostRepository: &repository.PostRepository{
-			DynamoDBHandler: dynamoDbHandler,
-		},
-		IdCounterRepository: &repository.IdCounterRepository{
-			DynamoDBHandler: dynamoDbHandler,
-		},
-	}
-
+	interactor := initTestPostInteractor()
 	params := PostInteractorCreateParams{
 		Category:    "aws",
 		Title:       "Test title",
@@ -118,7 +114,8 @@ func TestShouldCreatePost(t *testing.T) {
 
 func initTestPostInteractor() PostInteractor {
 	return PostInteractor{
-		PostRepository:      new(MockPostRepository),
-		IdCounterRepository: new(MockIdCounterRepository),
+		PostRepository:                new(MockPostRepository),
+		IdCounterRepository:           new(MockIdCounterRepository),
+		S3BookrecorderImageRepository: new(MockS3BookrecorderImageRepository),
 	}
 }

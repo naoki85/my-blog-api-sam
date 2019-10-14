@@ -16,6 +16,8 @@ Globals:
         POSTS_TABLE_NAME: Posts
         RECOMMENDED_BOOKS_TABLE_NAME: RecommendedBooks
         ID_COUNTER_TABLE_NAME: IdCounter
+        S3_ENDPOINT": ""
+        S3_BUCKET: bookrecorder-image
   Api:
     Cors:
       AllowMethods: "'OPTIONS,POST,GET,DELETE'"
@@ -84,6 +86,8 @@ Resources:
           POSTS_TABLE_NAME: !Ref PostsDynamoDBTable
           ID_COUNTER_TABLE_NAME: !Ref IdCounterDynamoDBTable
           USERS_TABLE_NAME: !Ref UsersDynamoDBTable
+          S3_ENDPOINT: ""
+          S3_BUCKET: bookrecorder-image
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
   ServerlessRestApi:
     Type: AWS::Serverless::Api

@@ -4,14 +4,16 @@ import (
 	"github.com/naoki85/my-blog-api-sam/model"
 	"github.com/naoki85/my-blog-api-sam/repository"
 	"github.com/naoki85/my-blog-api-sam/util"
+	"io"
 	"log"
 	"sort"
 	"time"
 )
 
 type PostInteractor struct {
-	PostRepository      PostRepository
-	IdCounterRepository IdCounterRepository
+	PostRepository                PostRepository
+	IdCounterRepository           IdCounterRepository
+	S3BookrecorderImageRepository S3BookrecorderImageRepository
 }
 
 type PostInteractorCreateParams struct {
@@ -21,6 +23,7 @@ type PostInteractorCreateParams struct {
 	ImageUrl    string `json:"imageUrl"`
 	Active      string `json:"active"`
 	PublishedAt string `json:"publishedAt"`
+	ImageBody   io.Reader
 }
 
 func (interactor *PostInteractor) Index(page int, all bool) (posts model.Posts, count int, err error) {
@@ -89,13 +92,24 @@ func (interactor *PostInteractor) Create(params PostInteractorCreateParams) (err
 		return
 	}
 
+	filename := params.ImageUrl
+	if filename != "-" {
+		filename = time.Now().Format("20060102150405") + params.ImageUrl
+
+		err = interactor.S3BookrecorderImageRepository.Create(filename, params.ImageBody)
+		if err != nil {
+			log.Fatalln(err.Error())
+			return
+		}
+	}
+
 	var inputParams = repository.PostCreateParams{
 		Id:          newId,
 		UserId:      1,
 		Category:    params.Category,
 		Title:       params.Title,
 		Content:     params.Content,
-		ImageUrl:    params.ImageUrl,
+		ImageUrl:    filename,
 		Active:      params.Active,
 		PublishedAt: params.PublishedAt,
 	}

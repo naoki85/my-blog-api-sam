@@ -29,6 +29,20 @@ services:
       - lambda-local
     volumes:
       - $PWD/docker/dynamodb/data:/data
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: hogehoge
+      MINIO_SECRET_KEY: fugafuga
+    ports:
+      - 9000:9000
+    volumes:
+      - $PWD/docker/minio/data:/data
+      - $PWD/docker/minio/config:/root/.
+    networks:
+      - lambda-local
 networks:
   lambda-local:
     external: true

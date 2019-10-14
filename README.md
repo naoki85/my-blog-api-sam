@@ -12,7 +12,7 @@ Start Mysql container.
 
 ```shell
 docker network create lambda-local
-docker-compose up dynamodb
+docker-compose up dynamodb localstack
 ```
 
 ### Building
@@ -89,4 +89,13 @@ $ aws dynamodb batch-write-item --request-items file://docker/dynamodb/sample/da
 $ aws dynamodb scan --table-name TableName --endpoint-url http://127.0.0.1:3307 --region ap-northeast-1
 # Delete table
 $ aws dynamodb delete-table --table-name TableName --endpoint-url http://127.0.0.1:3307 --region ap-northeast-1
+```
+
+## S3 Tips
+
+### CLI
+
+```
+# Create bucket
+$ aws s3 --endpoint-url=http://localhost:9000 mb s3://test-bucket --profile=localstack
 ```
