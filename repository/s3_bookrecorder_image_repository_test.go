@@ -29,3 +29,19 @@ func TestShouldUploadImage(t *testing.T) {
 		t.Fatalf("Cannot create user: %s", err)
 	}
 }
+
+func TestShouldGetSignedUrl(t *testing.T) {
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	s3Uploader, _ := infrastructure.NewS3UploaderHandler(c)
+	s3Handler, _ := infrastructure.NewS3Handler(c)
+	repo := S3BookrecorderImageRepository{
+		S3UploadHandler: s3Uploader,
+		S3Handler:       s3Handler,
+	}
+
+	_, err := repo.CreateSignedUrl("posts/hoge.png")
+	if err != nil {
+		t.Fatalf("Cannot create user: %s", err)
+	}
+}
