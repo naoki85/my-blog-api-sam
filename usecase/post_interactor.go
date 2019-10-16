@@ -34,9 +34,10 @@ func (interactor *PostInteractor) Index(page int, all bool) (posts model.Posts, 
 	var retPosts model.Posts
 	layout := "2006-01-02 15:04:05"
 	now := time.Now()
+	loc, _ := time.LoadLocation("Asia/Tokyo")
 	for _, post := range posts {
 		if !all {
-			t, err := time.Parse(layout, post.PublishedAt)
+			t, err := time.ParseInLocation(layout, post.PublishedAt, loc)
 			if err != nil {
 				log.Printf("%s", err.Error())
 				continue

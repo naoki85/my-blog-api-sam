@@ -5,24 +5,26 @@ import (
 	"github.com/naoki85/my-blog-api-sam/repository"
 	"io"
 	"testing"
+	"time"
 )
 
 type MockPostRepository struct {
 }
 
 func (repo *MockPostRepository) All() (model.Posts, int, error) {
+	p := time.Now().Add(-1 * time.Hour).Format("2006-01-02 15:04:05")
 	posts := model.Posts{
-		model.Post{Id: 1, PublishedAt: "2019-01-01 00:00:00"},
-		model.Post{Id: 2, PublishedAt: "2019-02-01 00:00:00"},
-		model.Post{Id: 3, PublishedAt: "2019-03-01 00:00:00"},
-		model.Post{Id: 4, PublishedAt: "2019-03-01 00:00:00"},
-		model.Post{Id: 5, PublishedAt: "2019-03-01 00:00:00"},
-		model.Post{Id: 6, PublishedAt: "2019-03-01 00:00:00"},
-		model.Post{Id: 7, PublishedAt: "2019-03-01 00:00:00"},
-		model.Post{Id: 8, PublishedAt: "2019-03-01 00:00:00"},
-		model.Post{Id: 9, PublishedAt: "2019-03-01 00:00:00"},
-		model.Post{Id: 10, PublishedAt: "2019-03-01 00:00:00"},
-		model.Post{Id: 11, PublishedAt: "2019-03-01 00:00:00"},
+		model.Post{Id: 1, PublishedAt: p},
+		model.Post{Id: 2, PublishedAt: p},
+		model.Post{Id: 3, PublishedAt: p},
+		model.Post{Id: 4, PublishedAt: p},
+		model.Post{Id: 5, PublishedAt: p},
+		model.Post{Id: 6, PublishedAt: p},
+		model.Post{Id: 7, PublishedAt: p},
+		model.Post{Id: 8, PublishedAt: p},
+		model.Post{Id: 9, PublishedAt: p},
+		model.Post{Id: 10, PublishedAt: p},
+		model.Post{Id: 11, PublishedAt: p},
 		model.Post{Id: 12, PublishedAt: "2021-01-01 00:00:00"},
 	}
 	return posts, 11, nil

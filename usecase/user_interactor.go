@@ -99,12 +99,14 @@ func (interactor *UserInteractor) CheckAuthenticationToken(authenticationToken s
 	user, err := interactor.UserRepository.FindByAuthenticationToken(authenticationToken)
 	if err != nil {
 		log.Printf("%s", err.Error())
+		return user, err
 	}
 	if user.Id == 0 {
 		err = errors.New("not found")
 	}
 	layout := "2006-01-02 15-04-05"
-	t, err := time.Parse(layout, user.AuthenticationTokenExpiredAt)
+	loc, _ := time.LoadLocation("Asia/Tokyo")
+	t, err := time.ParseInLocation(layout, user.AuthenticationTokenExpiredAt, loc)
 	if err != nil {
 		log.Println(err.Error())
 		return user, err
