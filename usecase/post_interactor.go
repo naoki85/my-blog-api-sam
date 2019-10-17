@@ -11,9 +11,8 @@ import (
 )
 
 type PostInteractor struct {
-	PostRepository                PostRepository
-	IdCounterRepository           IdCounterRepository
-	S3BookrecorderImageRepository S3BookrecorderImageRepository
+	PostRepository      PostRepository
+	IdCounterRepository IdCounterRepository
 }
 
 type PostInteractorCreateParams struct {
@@ -96,12 +95,6 @@ func (interactor *PostInteractor) Create(params PostInteractorCreateParams) (err
 	filename := params.ImageUrl
 	if filename != "-" {
 		filename = time.Now().Format("20060102150405") + params.ImageUrl
-
-		err = interactor.S3BookrecorderImageRepository.Create(filename, params.ImageBody)
-		if err != nil {
-			log.Fatalln(err.Error())
-			return
-		}
 	}
 
 	var inputParams = repository.PostCreateParams{

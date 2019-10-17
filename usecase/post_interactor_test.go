@@ -3,7 +3,6 @@ package usecase
 import (
 	"github.com/naoki85/my-blog-api-sam/model"
 	"github.com/naoki85/my-blog-api-sam/repository"
-	"io"
 	"testing"
 	"time"
 )
@@ -49,12 +48,6 @@ func (repo *MockIdCounterRepository) FindMaxIdByIdentifier(i string) (int, error
 
 func (repo *MockIdCounterRepository) UpdateMaxIdByIdentifier(i string, n int) (int, error) {
 	return 1, nil
-}
-
-type MockS3BookrecorderImageRepository struct{}
-
-func (repo *MockS3BookrecorderImageRepository) Create(f string, b io.Reader) error {
-	return nil
 }
 
 func TestShouldPostsIndex(t *testing.T) {
@@ -116,8 +109,7 @@ func TestShouldCreatePost(t *testing.T) {
 
 func initTestPostInteractor() PostInteractor {
 	return PostInteractor{
-		PostRepository:                new(MockPostRepository),
-		IdCounterRepository:           new(MockIdCounterRepository),
-		S3BookrecorderImageRepository: new(MockS3BookrecorderImageRepository),
+		PostRepository:      new(MockPostRepository),
+		IdCounterRepository: new(MockIdCounterRepository),
 	}
 }

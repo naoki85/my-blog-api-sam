@@ -38,6 +38,8 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return login(request)
 	} else if request.HTTPMethod == "DELETE" && request.Path == "/logout" {
 		return logout(request)
+	} else if request.HTTPMethod == "POST" && request.Path == "/upload" {
+		return requireLogin(getSignedUrl, request)
 	}
 	return handleError(404), nil
 }
@@ -191,6 +193,28 @@ func createUser(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRe
 	userController := controller.NewUserController(dynamoDbHandler)
 
 	res, status := userController.Create(params)
+	if status != config.SuccessStatus {
+		return handleError(status), nil
+	}
+	return apiResponse(fmt.Sprintf("%s", res), status), nil
+}
+
+func getSignedUrl(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	type GetSignedUrlRequest struct {
+		Filename string `json:"filename"`
+	}
+	var params GetSignedUrlRequest
+	requestBody := []byte(request.Body)
+	err := json.Unmarshal(requestBody, &params)
+	if err != nil {
+		return handleError(400), nil
+	}
+	config.InitDbConf("")
+	c := config.GetDbConf()
+	s3Handler, _ := infrastructure.NewS3Handler(c)
+	imageUploadController := controller.NewImageUploadController(s3Handler)
+
+	res, status := imageUploadController.GetSignedUrl(params.Filename)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}

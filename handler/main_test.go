@@ -138,6 +138,21 @@ func TestCreateUserHandler(t *testing.T) {
 	})
 }
 
+func TestGetSignedUrl(t *testing.T) {
+	t.Run("Successful Request", func(t *testing.T) {
+		authToken := testLogin()
+		res, _ := handler(events.APIGatewayProxyRequest{
+			HTTPMethod: "POST",
+			Path:       "/upload",
+			Headers:    map[string]string{"Authorization": fmt.Sprintf("Bearer %s", authToken)},
+			Body:       `{"filename":"hoge.png"}`,
+		})
+		if res.StatusCode != config.SuccessStatus {
+			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
+		}
+	})
+}
+
 func TestLoginAndLogoutHandler(t *testing.T) {
 	_, _ = createUser(events.APIGatewayProxyRequest{
 		Body: `{"email":"hoge@example.com","password":"hogehoge"}`,
