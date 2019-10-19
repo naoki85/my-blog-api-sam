@@ -20,7 +20,7 @@ Globals:
         S3_BUCKET: bookrecorder-image
   Api:
     Cors:
-      AllowMethods: "'OPTIONS,POST,GET,DELETE'"
+      AllowMethods: "'OPTIONS,POST,GET,PUT,DELETE'"
       AllowHeaders: "'content-type,Authorization'"
       AllowOrigin: "'*'"
 
@@ -82,7 +82,7 @@ Resources:
           Type: Api
           Properties:
             Path: /upload
-            Method: POST
+            Method: PUT
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           TZ: Asia/Tokyo

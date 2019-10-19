@@ -38,7 +38,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return login(request)
 	} else if request.HTTPMethod == "DELETE" && request.Path == "/logout" {
 		return logout(request)
-	} else if request.HTTPMethod == "POST" && request.Path == "/upload" {
+	} else if request.HTTPMethod == "PUT" && request.Path == "/upload" {
 		return requireLogin(getSignedUrl, request)
 	}
 	return handleError(404), nil
