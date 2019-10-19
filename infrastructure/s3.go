@@ -4,13 +4,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/naoki85/my-blog-api-sam/config"
 )
 
-func NewS3UploaderHandler(c *config.Config) (*s3manager.Uploader, error) {
+func NewS3Handler(c *config.Config) (*s3.S3, error) {
 	var awsConf *aws.Config
-	if len(c.DynamoDbEndpoint) > 0 {
+	if len(c.S3Endpoint) > 0 {
 		awsConf = &aws.Config{
 			Credentials:      credentials.NewStaticCredentials("hogehoge", "fugafuga", ""),
 			Region:           aws.String("ap-northeast-1"),
@@ -23,9 +23,5 @@ func NewS3UploaderHandler(c *config.Config) (*s3manager.Uploader, error) {
 		}
 	}
 	sess := session.Must(session.NewSession(awsConf))
-	uploader := s3manager.NewUploader(sess, func(u *s3manager.Uploader) {
-		// Define a strategy that will buffer 25 MiB in memory
-		u.BufferProvider = s3manager.NewBufferedReadSeekerWriteToPool(25 * 1024 * 1024)
-	})
-	return uploader, nil
+	return s3.New(sess), nil
 }
