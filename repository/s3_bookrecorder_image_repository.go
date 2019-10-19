@@ -9,6 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"io"
 	"os"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -44,6 +46,12 @@ func (repo *S3BookrecorderImageRepository) CreateSignedUrl(filePath string) (str
 		return "", err
 	}
 	_, err = buf.Seek(0, 0)
+
+	// minio の URL が生成される場合は localhost に書き換える
+	regEx := regexp.MustCompile(`^http://minio`)
+	if regEx.MatchString(url) {
+		url = strings.Replace(url, "http://minio", "http://localhost", 1)
+	}
 
 	return url, err
 }
