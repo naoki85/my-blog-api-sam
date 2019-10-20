@@ -142,7 +142,7 @@ func TestGetSignedUrl(t *testing.T) {
 	t.Run("Successful Request", func(t *testing.T) {
 		authToken := testLogin()
 		res, _ := handler(events.APIGatewayProxyRequest{
-			HTTPMethod: "POST",
+			HTTPMethod: "PUT",
 			Path:       "/upload",
 			Headers:    map[string]string{"Authorization": fmt.Sprintf("Bearer %s", authToken)},
 			Body:       `{"filename":"hoge.png"}`,

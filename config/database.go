@@ -21,7 +21,7 @@ var once sync.Once
 func InitDbConf(env string) {
 	once.Do(func() {
 		testFlag := os.Getenv("TEST_FLAG")
-		if testFlag != "" {
+		if testFlag != "" || env == "test" {
 			instance = &Config{
 				Username:         "root",
 				Password:         "root",
