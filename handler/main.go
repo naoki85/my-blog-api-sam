@@ -52,8 +52,8 @@ func requireLogin(f func(events.APIGatewayProxyRequest) (events.APIGatewayProxyR
 	request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	header := request.Headers["Authorization"]
 	authenticationToken := strings.Split(header, " ")[1]
-	config.InitDbConf("")
-	c := config.GetDbConf()
+
+	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
 	userController := controller.NewUserController(dynamoDbHandler)
 	_, status := userController.LoginStatus(authenticationToken)
@@ -64,8 +64,7 @@ func requireLogin(f func(events.APIGatewayProxyRequest) (events.APIGatewayProxyR
 }
 
 func recommendedBooks() (events.APIGatewayProxyResponse, error) {
-	config.InitDbConf("")
-	c := config.GetDbConf()
+	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
 	testController := controller.NewRecommendedBookController(dynamoDbHandler)
 	recommendedBooks, status := testController.Index()
@@ -85,8 +84,7 @@ func createRecommendedBook(request events.APIGatewayProxyRequest) (events.APIGat
 		return handleError(400), nil
 	}
 
-	config.InitDbConf("")
-	c := config.GetDbConf()
+	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
 	testController := controller.NewRecommendedBookController(dynamoDbHandler)
 	recommendedBooks, status := testController.Create(params)
@@ -104,8 +102,7 @@ func posts(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 		return handleError(400), nil
 	}
 
-	config.InitDbConf("")
-	c := config.GetDbConf()
+	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
 
 	var all bool
@@ -142,8 +139,7 @@ func post(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse
 		format = "html"
 	}
 
-	config.InitDbConf("")
-	c := config.GetDbConf()
+	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
 	postController := controller.NewPostController(dynamoDbHandler)
 
@@ -167,8 +163,7 @@ func createPost(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRe
 		return handleError(400), nil
 	}
 
-	config.InitDbConf("")
-	c := config.GetDbConf()
+	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
 	testController := controller.NewPostController(dynamoDbHandler)
 	recommendedBooks, status := testController.Create(params)
@@ -187,8 +182,8 @@ func createUser(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRe
 	if err != nil {
 		return handleError(400), nil
 	}
-	config.InitDbConf("")
-	c := config.GetDbConf()
+
+	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
 	userController := controller.NewUserController(dynamoDbHandler)
 
@@ -209,8 +204,8 @@ func getSignedUrl(request events.APIGatewayProxyRequest) (events.APIGatewayProxy
 	if err != nil {
 		return handleError(400), nil
 	}
-	config.InitDbConf("")
-	c := config.GetDbConf()
+
+	c := initConf()
 	s3Handler, _ := infrastructure.NewS3Handler(c)
 	imageUploadController := controller.NewImageUploadController(s3Handler)
 
@@ -228,8 +223,8 @@ func login(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 	if err != nil {
 		return handleError(400), nil
 	}
-	config.InitDbConf("")
-	c := config.GetDbConf()
+
+	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
 	userController := controller.NewUserController(dynamoDbHandler)
 
@@ -243,8 +238,8 @@ func login(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 func logout(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	header := request.Headers["Authorization"]
 	authenticationToken := strings.Split(header, " ")[1]
-	config.InitDbConf("")
-	c := config.GetDbConf()
+
+	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
 	userController := controller.NewUserController(dynamoDbHandler)
 
@@ -287,4 +282,9 @@ func ogpResponse(message string, status int) events.APIGatewayProxyResponse {
 		Headers:    map[string]string{"content-type": "text/html", "Access-Control-Allow-Origin": "*"},
 		StatusCode: status,
 	}
+}
+
+func initConf() *config.Config {
+	config.InitDbConf("production")
+	return config.GetDbConf()
 }
