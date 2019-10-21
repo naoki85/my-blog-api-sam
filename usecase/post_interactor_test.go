@@ -44,6 +44,10 @@ func (repo *MockPostRepository) Update(params repository.PostCreateParams) error
 	return nil
 }
 
+func (repo *MockPostRepository) Delete(id int) error {
+	return nil
+}
+
 type MockIdCounterRepository struct{}
 
 func (repo *MockIdCounterRepository) FindMaxIdByIdentifier(i string) (int, error) {
@@ -113,7 +117,15 @@ func TestShouldCreatePost(t *testing.T) {
 	params.Id = 2
 	err = interactor.Update(params)
 	if err != nil {
-		t.Fatalf("Could not create recommended book: %s", err.Error())
+		t.Fatalf("fail to update post: %s", err.Error())
+	}
+}
+
+func TestShouldDeletePost(t *testing.T) {
+	interactor := initTestPostInteractor()
+	err := interactor.Delete(1)
+	if err != nil {
+		t.Fatal("fail to delete")
 	}
 }
 

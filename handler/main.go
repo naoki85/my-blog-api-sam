@@ -34,6 +34,8 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	} else if regexp.MustCompile(`^/posts/(\d+)`).MatchString(request.Path) {
 		if request.HTTPMethod == "PUT" {
 			return requireLogin(updatePost, request)
+		} else if request.HTTPMethod == "DELETE" {
+			return requireLogin(deletePost, request)
 		} else {
 			return post(request)
 		}
@@ -200,6 +202,25 @@ func updatePost(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRe
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
 	testController := controller.NewPostController(dynamoDbHandler)
 	data, status := testController.Update(params)
+
+	if status != config.SuccessStatus {
+		return handleError(status), nil
+	}
+
+	return apiResponse(fmt.Sprintf("%s", data), status), nil
+}
+
+func deletePost(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	postId, err := strconv.Atoi(request.PathParameters["id"])
+	if err != nil {
+		log.Println("fail to get postId")
+		return handleError(400), nil
+	}
+
+	c := initConf()
+	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
+	testController := controller.NewPostController(dynamoDbHandler)
+	data, status := testController.Delete(postId)
 
 	if status != config.SuccessStatus {
 		return handleError(status), nil

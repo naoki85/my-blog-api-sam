@@ -207,8 +207,25 @@ func (repo *PostRepository) Update(params PostCreateParams) (err error) {
 	_, err = repo.DynamoDBHandler.UpdateItem(input)
 	if err != nil {
 		log.Printf("dynamodbErr: %s", err.Error())
-		return
 	}
 
-	return nil
+	return
+}
+
+func (repo *PostRepository) Delete(id int) (err error) {
+	input := &dynamodb.DeleteItemInput{
+		TableName: aws.String(repo.tableName()),
+		Key: map[string]*dynamodb.AttributeValue{
+			"Id": {
+				N: aws.String(strconv.Itoa(id)),
+			},
+		},
+	}
+
+	_, err = repo.DynamoDBHandler.DeleteItem(input)
+	if err != nil {
+		log.Printf("dynamodbErr: %s", err.Error())
+	}
+
+	return
 }

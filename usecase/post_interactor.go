@@ -126,3 +126,8 @@ func (interactor *PostInteractor) Update(params PostInteractorCreateParams) (err
 	err = interactor.PostRepository.Update(inputParams)
 	return
 }
+
+func (interactor *PostInteractor) Delete(id int) (err error) {
+	err = interactor.PostRepository.Delete(id)
+	return
+}

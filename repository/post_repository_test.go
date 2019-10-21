@@ -41,7 +41,7 @@ func TestShouldFindPostById(t *testing.T) {
 	}
 }
 
-func TestShouldCreateAndUpdatePost(t *testing.T) {
+func TestFromCreateToDeleteThroughUpdate(t *testing.T) {
 	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
 	repo := PostRepository{
@@ -59,7 +59,7 @@ func TestShouldCreateAndUpdatePost(t *testing.T) {
 	}
 	err := repo.Create(params)
 	if err != nil {
-		t.Fatalf("Cannot create recommended_book: %s", err)
+		t.Fatalf("fail to create post: %s", err)
 	}
 
 	category := "ruby"
@@ -79,7 +79,7 @@ func TestShouldCreateAndUpdatePost(t *testing.T) {
 	}
 	err = repo.Update(params)
 	if err != nil {
-		t.Fatalf("Cannot create recommended_book: %s", err)
+		t.Fatalf("fail to update post: %s", err)
 	}
 
 	post, _ := repo.FindById(params.Id)
@@ -94,5 +94,10 @@ func TestShouldCreateAndUpdatePost(t *testing.T) {
 	}
 	if post.ImageUrl != imageUrl {
 		t.Fatalf("Expacted: %s, but got %s", imageUrl, post.ImageUrl)
+	}
+
+	err = repo.Delete(2)
+	if err != nil {
+		t.Fatalf("fail to delete post: %s", err)
 	}
 }

@@ -10,4 +10,5 @@ type PostRepository interface {
 	FindById(int) (model.Post, error)
 	Create(repository.PostCreateParams) error
 	Update(repository.PostCreateParams) error
+	Delete(int) error
 }
