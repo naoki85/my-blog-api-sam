@@ -16,6 +16,7 @@ type PostInteractor struct {
 }
 
 type PostInteractorCreateParams struct {
+	Id          int    `json:"id"`
 	Category    string `json:"category"`
 	Title       string `json:"title"`
 	Content     string `json:"content"`
@@ -108,5 +109,20 @@ func (interactor *PostInteractor) Create(params PostInteractorCreateParams) (err
 		PublishedAt: params.PublishedAt,
 	}
 	err = interactor.PostRepository.Create(inputParams)
-	return err
+	return
+}
+
+func (interactor *PostInteractor) Update(params PostInteractorCreateParams) (err error) {
+	var inputParams = repository.PostCreateParams{
+		Id:          params.Id,
+		UserId:      1,
+		Category:    params.Category,
+		Title:       params.Title,
+		Content:     params.Content,
+		ImageUrl:    params.ImageUrl,
+		Active:      params.Active,
+		PublishedAt: params.PublishedAt,
+	}
+	err = interactor.PostRepository.Update(inputParams)
+	return
 }
