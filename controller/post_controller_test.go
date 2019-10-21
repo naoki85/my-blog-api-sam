@@ -85,4 +85,10 @@ func TestShouldCreatePost(t *testing.T) {
 	if status != config.SuccessStatus {
 		t.Fatalf("Should get 200 status, but got: %d", status)
 	}
+
+	params.Id = 2
+	_, status = controller.Update(params)
+	if status != config.SuccessStatus {
+		t.Fatalf("Should get 200 status, but got: %d", status)
+	}
 }

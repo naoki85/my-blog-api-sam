@@ -93,6 +93,24 @@ func (controller *PostController) Create(params usecase.PostInteractorCreatePara
 	return resp, config.SuccessStatus
 }
 
+func (controller *PostController) Update(params usecase.PostInteractorCreateParams) ([]byte, int) {
+	err := controller.Interactor.Update(params)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return []byte{}, config.InvalidParameterStatus
+	}
+
+	data := struct {
+		Message string
+	}{"success"}
+	resp, err := json.Marshal(data)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return resp, config.InternalServerErrorStatus
+	}
+	return resp, config.SuccessStatus
+}
+
 func ogpHtml(post model.Post) ([]byte, error) {
 	var html string
 	var content string
