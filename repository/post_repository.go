@@ -99,22 +99,23 @@ func (repo *PostRepository) FindById(id int) (post model.Post, err error) {
 	return
 }
 
+type PostItem struct {
+	Id          int
+	UserId      int
+	Category    string
+	Title       string
+	Content     string
+	ImageUrl    string
+	Active      string
+	PublishedAt string
+	CreatedAt   string
+	UpdatedAt   string
+}
+
 func (repo *PostRepository) Create(params PostCreateParams) (err error) {
-	type Item struct {
-		Id          int
-		UserId      int
-		Category    string
-		Title       string
-		Content     string
-		ImageUrl    string
-		Active      string
-		PublishedAt string
-		CreatedAt   string
-		UpdatedAt   string
-	}
 	now := time.Now().Format("2006-01-02 15-04-05")
 
-	item := Item{
+	item := PostItem{
 		Id:          params.Id,
 		UserId:      params.UserId,
 		Category:    params.Category,
@@ -142,6 +143,70 @@ func (repo *PostRepository) Create(params PostCreateParams) (err error) {
 	if err != nil {
 		log.Println("Got error calling PutItem:")
 		log.Println(err.Error())
+		return
+	}
+
+	return nil
+}
+
+func (repo *PostRepository) Update(params PostCreateParams) (err error) {
+	now := time.Now().Format("2006-01-02 15-04-05")
+
+	item := PostItem{
+		Id:          params.Id,
+		UserId:      params.UserId,
+		Category:    params.Category,
+		Title:       params.Title,
+		Content:     params.Content,
+		ImageUrl:    params.ImageUrl,
+		Active:      params.Active,
+		PublishedAt: params.PublishedAt,
+		UpdatedAt:   now,
+	}
+
+	stmt := "set UserId = :userId, Category = :category, Title = :title, Content = :content, ImageUrl = :imageUrl,"
+	stmt += "Active = :active, PublishedAt = :publishedAt, UpdatedAt = :updatedAt"
+
+	input := &dynamodb.UpdateItemInput{
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":userId": {
+				N: aws.String(strconv.Itoa(item.UserId)),
+			},
+			":category": {
+				S: aws.String(item.Category),
+			},
+			":title": {
+				S: aws.String(item.Title),
+			},
+			":content": {
+				S: aws.String(item.Content),
+			},
+			":imageUrl": {
+				S: aws.String(item.ImageUrl),
+			},
+			":active": {
+				S: aws.String(item.Active),
+			},
+			":publishedAt": {
+				S: aws.String(item.PublishedAt),
+			},
+			":updatedAt": {
+				S: aws.String(item.UpdatedAt),
+			},
+		},
+		TableName: aws.String(repo.tableName()),
+		Key: map[string]*dynamodb.AttributeValue{
+			"Id": {
+				N: aws.String(strconv.Itoa(item.Id)),
+			},
+		},
+		ReturnValues:     aws.String("UPDATED_NEW"),
+		UpdateExpression: aws.String(stmt),
+	}
+
+	_, err = repo.DynamoDBHandler.UpdateItem(input)
+	if err != nil {
+		log.Printf("dynamodbErr: %s", err.Error())
 		return
 	}
 

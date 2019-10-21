@@ -41,7 +41,7 @@ func TestShouldFindPostById(t *testing.T) {
 	}
 }
 
-func TestShouldCreatePost(t *testing.T) {
+func TestShouldCreateAndUpdatePost(t *testing.T) {
 	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
 	repo := PostRepository{
@@ -60,5 +60,39 @@ func TestShouldCreatePost(t *testing.T) {
 	err := repo.Create(params)
 	if err != nil {
 		t.Fatalf("Cannot create recommended_book: %s", err)
+	}
+
+	category := "ruby"
+	title := "Test title 2"
+	content := "Test content 2"
+	imageUrl := "test.png 2"
+
+	params = PostCreateParams{
+		Id:          2,
+		UserId:      1,
+		Category:    category,
+		Title:       title,
+		Content:     content,
+		ImageUrl:    imageUrl,
+		Active:      "published",
+		PublishedAt: "2019-10-01 00:00:00",
+	}
+	err = repo.Update(params)
+	if err != nil {
+		t.Fatalf("Cannot create recommended_book: %s", err)
+	}
+
+	post, _ := repo.FindById(params.Id)
+	if post.Category != category {
+		t.Fatalf("Expacted: %s, but got %s", category, post.Category)
+	}
+	if post.Title != title {
+		t.Fatalf("Expacted: %s, but got %s", title, post.Title)
+	}
+	if post.Content != content {
+		t.Fatalf("Expacted: %s, but got %s", content, post.Content)
+	}
+	if post.ImageUrl != imageUrl {
+		t.Fatalf("Expacted: %s, but got %s", imageUrl, post.ImageUrl)
 	}
 }
