@@ -30,7 +30,7 @@ func TestShouldFindUserByAuthenticationToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not find user: %s", err.Error())
 	}
-	if user.Id != 3 {
+	if user.Id != 1 {
 		t.Fatalf("Fail expected id: 1, got: %d", user.Id)
 	}
 }

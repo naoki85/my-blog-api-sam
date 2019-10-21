@@ -63,6 +63,16 @@ Resources:
           Properties:
             Path: /posts
             Method: POST
+        PostsUpdateApi:
+          Type: Api
+          Properties:
+            Path: /posts/{id}
+            Method: PUT
+        PostsDeleteApi:
+          Type: Api
+          Properties:
+            Path: /posts/{id}
+            Method: DELETE
         UsersCreateApi:
           Type: Api
           Properties:

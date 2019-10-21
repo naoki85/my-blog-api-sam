@@ -107,7 +107,7 @@ func TestPostHandler(t *testing.T) {
 	})
 }
 
-func TestCreatePostHandler(t *testing.T) {
+func TestFromCreateToUpdateThroughUpdate(t *testing.T) {
 	_, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
 
@@ -118,6 +118,25 @@ func TestCreatePostHandler(t *testing.T) {
 			Path:       "/posts",
 			Headers:    map[string]string{"Authorization": fmt.Sprintf("Bearer %s", authToken)},
 			Body:       `{"category":"aws","title":"test title","content":"test content","imageUrl":"test.com","active":"published","publishedAt":"2019-10-01 00:00:00"}`,
+		})
+		if res.StatusCode != config.SuccessStatus {
+			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
+		}
+		res, _ = handler(events.APIGatewayProxyRequest{
+			HTTPMethod:     "PUT",
+			Path:           "/posts/2",
+			PathParameters: map[string]string{"id": "2"},
+			Headers:        map[string]string{"Authorization": fmt.Sprintf("Bearer %s", authToken)},
+			Body:           `{"category":"aws","title":"test title","content":"test content","imageUrl":"test.com","active":"published","publishedAt":"2019-10-01 00:00:00"}`,
+		})
+		if res.StatusCode != config.SuccessStatus {
+			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
+		}
+		res, _ = handler(events.APIGatewayProxyRequest{
+			HTTPMethod:     "DELETE",
+			Path:           "/posts/2",
+			PathParameters: map[string]string{"id": "2"},
+			Headers:        map[string]string{"Authorization": fmt.Sprintf("Bearer %s", authToken)},
 		})
 		if res.StatusCode != config.SuccessStatus {
 			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
@@ -155,14 +174,14 @@ func TestGetSignedUrl(t *testing.T) {
 
 func TestLoginAndLogoutHandler(t *testing.T) {
 	_, _ = createUser(events.APIGatewayProxyRequest{
-		Body: `{"email":"hoge@example.com","password":"hogehoge"}`,
+		Body: `{"email":"hogehoge@example.com","password":"hogehoge"}`,
 	})
 
 	t.Run("Successful Request", func(t *testing.T) {
 		res, _ := login(events.APIGatewayProxyRequest{
 			HTTPMethod: "POST",
 			Path:       "/login",
-			Body:       `{"email":"hoge@example.com","password":"hogehoge"}`,
+			Body:       `{"email":"hogehoge@example.com","password":"hogehoge"}`,
 		})
 		if res.StatusCode != config.SuccessStatus {
 			t.Fatalf("Expected status: 200, but got %v", res.StatusCode)
@@ -192,12 +211,12 @@ func TestLoginAndLogoutHandler(t *testing.T) {
 
 func testLogin() string {
 	_, _ = createUser(events.APIGatewayProxyRequest{
-		Body: `{"email":"hoge@example.com","password":"hogehoge"}`,
+		Body: `{"email":"hogehoge@example.com","password":"hogehoge"}`,
 	})
 	res, _ := login(events.APIGatewayProxyRequest{
 		HTTPMethod: "POST",
 		Path:       "/login",
-		Body:       `{"email":"hoge@example.com","password":"hogehoge"}`,
+		Body:       `{"email":"hogehoge@example.com","password":"hogehoge"}`,
 	})
 	return res.Body
 }

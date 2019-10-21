@@ -67,7 +67,7 @@ func TestShouldGetPostsForShow(t *testing.T) {
 	})
 }
 
-func TestShouldCreatePost(t *testing.T) {
+func TestFromCreateToUpdateThroughUpdate(t *testing.T) {
 	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
 	controller := NewPostController(dynamoDbHandler)
@@ -82,6 +82,16 @@ func TestShouldCreatePost(t *testing.T) {
 	}
 
 	_, status := controller.Create(params)
+	if status != config.SuccessStatus {
+		t.Fatalf("Should get 200 status, but got: %d", status)
+	}
+
+	params.Id = 2
+	_, status = controller.Update(params)
+	if status != config.SuccessStatus {
+		t.Fatalf("Should get 200 status, but got: %d", status)
+	}
+	_, status = controller.Delete(params.Id)
 	if status != config.SuccessStatus {
 		t.Fatalf("Should get 200 status, but got: %d", status)
 	}
