@@ -93,18 +93,13 @@ func (interactor *PostInteractor) Create(params PostInteractorCreateParams) (err
 		return
 	}
 
-	filename := params.ImageUrl
-	if filename != "-" {
-		filename = time.Now().Format("20060102150405") + params.ImageUrl
-	}
-
 	var inputParams = repository.PostCreateParams{
 		Id:          newId,
 		UserId:      1,
 		Category:    params.Category,
 		Title:       params.Title,
 		Content:     params.Content,
-		ImageUrl:    filename,
+		ImageUrl:    params.ImageUrl,
 		Active:      params.Active,
 		PublishedAt: params.PublishedAt,
 	}
