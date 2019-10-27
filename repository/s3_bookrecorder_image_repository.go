@@ -2,16 +2,14 @@ package repository
 
 import (
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
+	_interface "github.com/naoki85/my-blog-api-sam/interface"
 	"os"
 	"regexp"
 	"strings"
-	"time"
 )
 
 type S3BookrecorderImageRepository struct {
-	S3Handler *s3.S3
+	S3Handler S3Handler
 }
 
 func (repo *S3BookrecorderImageRepository) bucketName() (bucketName string) {
@@ -23,12 +21,12 @@ func (repo *S3BookrecorderImageRepository) bucketName() (bucketName string) {
 }
 
 func (repo *S3BookrecorderImageRepository) CreateSignedUrl(filePath string) (string, error) {
-	r, _ := repo.S3Handler.PutObjectRequest(&s3.PutObjectInput{
-		Bucket: aws.String(repo.bucketName()),
-		Key:    aws.String(filePath),
-	})
+	input := _interface.S3Input{
+		Bucket: repo.bucketName(),
+		Key:    filePath,
+	}
 
-	url, err := r.Presign(15 * time.Minute)
+	url, err := repo.S3Handler.CreateSignedUrl(input)
 	if err != nil {
 		fmt.Println("error presigning request", err)
 		return "", err
