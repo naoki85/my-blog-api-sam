@@ -4,6 +4,7 @@ import (
 	"github.com/naoki85/my-blog-api-sam/model"
 	"github.com/naoki85/my-blog-api-sam/repository"
 	"log"
+	"sort"
 )
 
 type RecommendedBookInteractor struct {
@@ -41,6 +42,7 @@ func (interactor *RecommendedBookInteractor) All(limit int) (recommendedBooks mo
 			recommendedBooks = append(recommendedBooks, book)
 		}
 	}
+	sort.Slice(recommendedBooks, func(i, j int) bool { return recommendedBooks[i].Id > recommendedBooks[j].Id })
 
 	return
 }

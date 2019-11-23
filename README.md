@@ -12,13 +12,13 @@ Start Mysql container.
 
 ```shell
 docker network create lambda-local
-docker-compose up dynamodb localstack
+docker-compose up dynamodb minio
 ```
 
 ### Building
 
 ```shell
-GOOS=linux GOARCH=amd64 go build -o hello-world/hello-world ./hello-world
+GOOS=linux GOARCH=amd64 go build -o handler/handler ./handler
 or
 make build
 ```

@@ -8,3 +8,5 @@ require (
 	golang.org/x/crypto v0.0.0-20190911031432-227b76d455e7
 	gopkg.in/DATA-DOG/go-sqlmock.v2 v2.0.0-20180914054222-c19298f520d0
 )
+
+go 1.13
