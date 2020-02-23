@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"github.com/naoki85/my-blog-api-sam/config"
 	"github.com/naoki85/my-blog-api-sam/model"
 	"github.com/naoki85/my-blog-api-sam/repository"
 	"github.com/naoki85/my-blog-api-sam/util"
@@ -49,7 +50,7 @@ func (interactor *PostInteractor) Index(page int, all bool) (posts model.Posts, 
 		if post.ImageUrl == "-" {
 			post.ImageUrl = "https://s3-ap-northeast-1.amazonaws.com/bookrecorder-image/commons/default_user_icon.png"
 		} else {
-			post.ImageUrl = "http://d29xhtkvbwm2ne.cloudfront.net/" + post.ImageUrl
+			post.ImageUrl = config.ImageBaseUrl + "/" + post.ImageUrl
 		}
 		retPosts = append(retPosts, post)
 	}
@@ -74,7 +75,7 @@ func (interactor *PostInteractor) FindById(id int) (post model.Post, err error) 
 		log.Printf("%s", err.Error())
 		return
 	}
-	post.ImageUrl = "http://d29xhtkvbwm2ne.cloudfront.net/" + post.ImageUrl
+	post.ImageUrl = config.ImageBaseUrl + "/" + post.ImageUrl
 
 	return
 }

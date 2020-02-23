@@ -6,4 +6,6 @@ const (
 	UnauthorizedStatus        = 401
 	NotFoundStatus            = 404
 	InternalServerErrorStatus = 500
+
+	ImageBaseUrl = "https://image.naoki85.me"
 )
