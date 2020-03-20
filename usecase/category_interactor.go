@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/repository"
 	"log"
 )
 
@@ -24,8 +25,8 @@ func (interactor *CategoryInteractor) Index() (categories model.Categories, err 
 	return
 }
 
-func (interactor *CategoryInteractor) FindById(identifier string) (category model.Category, err error) {
-	category, err = interactor.CategoryRepository.FindById(identifier)
+func (interactor *CategoryInteractor) FindByIdentifier(identifier string) (category model.Category, err error) {
+	category, err = interactor.CategoryRepository.FindByIdentifier(identifier)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return
@@ -35,12 +36,22 @@ func (interactor *CategoryInteractor) FindById(identifier string) (category mode
 }
 
 func (interactor *CategoryInteractor) Create(params CategoryCreateParams) (err error) {
-	err = interactor.CategoryRepository.Create(params)
+	inputParams := repository.CategoryCreateParams{
+		Identifier: params.Identifier,
+		JpName:     params.JpName,
+		Color:      params.Color,
+	}
+	err = interactor.CategoryRepository.Create(inputParams)
 	return
 }
 
 func (interactor *CategoryInteractor) Update(params CategoryCreateParams) (err error) {
-	err = interactor.CategoryRepository.Update(params)
+	inputParams := repository.CategoryCreateParams{
+		Identifier: params.Identifier,
+		JpName:     params.JpName,
+		Color:      params.Color,
+	}
+	err = interactor.CategoryRepository.Update(inputParams)
 	return
 }
 

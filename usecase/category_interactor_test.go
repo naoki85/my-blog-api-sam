@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"github.com/naoki85/my-blog-api-sam/model"
+	"github.com/naoki85/my-blog-api-sam/repository"
 	"testing"
 )
 
@@ -24,7 +25,7 @@ func (repo *MockCategoryRepository) All() (categories model.Categories, err erro
 	return categories, nil
 }
 
-func (repo *MockCategoryRepository) FindById(string) (category model.Category, err error) {
+func (repo *MockCategoryRepository) FindByIdentifier(string) (category model.Category, err error) {
 	category = model.Category{
 		Identifier: "test",
 		JpName:     "test",
@@ -33,11 +34,11 @@ func (repo *MockCategoryRepository) FindById(string) (category model.Category, e
 	return category, nil
 }
 
-func (repo *MockCategoryRepository) Create(CategoryCreateParams) error {
+func (repo *MockCategoryRepository) Create(repository.CategoryCreateParams) error {
 	return nil
 }
 
-func (repo *MockCategoryRepository) Update(CategoryCreateParams) error {
+func (repo *MockCategoryRepository) Update(repository.CategoryCreateParams) error {
 	return nil
 }
 
@@ -59,9 +60,9 @@ func TestShouldCategoriesIndex(t *testing.T) {
 	})
 }
 
-func TestShouldFindCategoryById(t *testing.T) {
+func TestShouldFindCategoryByIdentifier(t *testing.T) {
 	interactor := initTestCategoryInteractor()
-	category, err := interactor.FindById("test")
+	category, err := interactor.FindByIdentifier("test")
 	if err != nil {
 		t.Fatalf("Cannot get category: %s", err)
 	}
