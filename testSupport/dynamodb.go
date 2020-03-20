@@ -14,8 +14,10 @@ func SetupTestDynamoDb() (*dynamodb.DynamoDB, func()) {
 	if endpoint == "" {
 		endpoint = "http://localhost:3307"
 	}
+	id := os.Getenv("AWS_ACCESS_KEY_ID")
+	secret := os.Getenv("AWS_SECRET_ACCESS_KEY")
 	dynamoSession, err := session.NewSession(&aws.Config{
-		Credentials: credentials.NewStaticCredentials("hogehoge", "fugafuga", ""),
+		Credentials: credentials.NewStaticCredentials(id, secret, ""),
 		Region:      aws.String("ap-northeast-1"),
 		Endpoint:    aws.String(endpoint),
 	})
