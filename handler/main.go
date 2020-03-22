@@ -31,6 +31,26 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		} else {
 			return posts(request)
 		}
+	} else if request.Path == "/categories" {
+		if request.HTTPMethod == "POST" {
+			return requireLogin(createCategory, request)
+		} else {
+			return categories()
+		}
+	} else if regexp.MustCompile(`^/categories/(.+)`).MatchString(request.Path) {
+		if request.HTTPMethod == "PUT" {
+			return requireLogin(updateCategory, request)
+		} else if request.HTTPMethod == "DELETE" {
+			return requireLogin(deleteCategory, request)
+		} else {
+			return category(request)
+		}
+	} else if request.Path == "/posts" {
+		if request.HTTPMethod == "POST" {
+			return requireLogin(createPost, request)
+		} else {
+			return posts(request)
+		}
 	} else if regexp.MustCompile(`^/posts/(\d+)`).MatchString(request.Path) {
 		if request.HTTPMethod == "PUT" {
 			return requireLogin(updatePost, request)
