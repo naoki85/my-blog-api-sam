@@ -1,0 +1,114 @@
+{
+  "Categories": [
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "other" },
+          "JpName": { "S": "その他" },
+          "Color": { "S": "#6D4C41" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "vuejs" },
+          "JpName": { "S": "Vue/Nuxt" },
+          "Color": { "S": "#4fc08d" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "ruby" },
+          "JpName": { "S": "Ruby/Rails" },
+          "Color": { "S": "#CC342D" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "aws" },
+          "JpName": { "S": "AWS" },
+          "Color": { "S": "#ff9d00" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "php" },
+          "JpName": { "S": "PHP" },
+          "Color": { "S": "#8892BF" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "kotlin" },
+          "JpName": { "S": "Kotlin" },
+          "Color": { "S": "#039BE5" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "android" },
+          "JpName": { "S": "Android" },
+          "Color": { "S": "#78c257" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "web" },
+          "JpName": { "S": "Web 一般" },
+          "Color": { "S": "#FF8000" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "go" },
+          "JpName": { "S": "Go" },
+          "Color": { "S": "#40e0d0" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "Identifier": { "S": "react" },
+          "JpName": { "S": "React/Next" },
+          "Color": { "S": "#61dafb" },
+          "CreatedAt": { "S": "2019-09-30 10:00:00" },
+          "UpdatedAt": { "S": "2019-09-30 10:00:00" }
+        }
+      }
+    }
+  ]
+}
