@@ -16,7 +16,7 @@ Globals:
         POSTS_TABLE_NAME: Posts
         RECOMMENDED_BOOKS_TABLE_NAME: RecommendedBooks
         ID_COUNTER_TABLE_NAME: IdCounter
-        CATEGORIES_TABLE_NAME: Categories,
+        CATEGORIES_TABLE_NAME: Categories
         S3_ENDPOINT: ""
         S3_BUCKET: bookrecorder-image
   Api:
@@ -127,6 +127,7 @@ Resources:
           POSTS_TABLE_NAME: !Ref PostsDynamoDBTable
           ID_COUNTER_TABLE_NAME: !Ref IdCounterDynamoDBTable
           USERS_TABLE_NAME: !Ref UsersDynamoDBTable
+          CATEGORIES_TABLE_NAME: !Ref CategoriesDynamoDBTable
           S3_ENDPOINT: ""
           S3_BUCKET: bookrecorder-image
       Role: "arn:aws:iam::873781314098:role/my-blog-api-sam-MyBlogApiFunctionRole-1HTYS5Y6FSF5R"
