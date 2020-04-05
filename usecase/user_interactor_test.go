@@ -6,6 +6,12 @@ import (
 	"testing"
 )
 
+type MockSesHandler struct{}
+
+func (sesHandler *MockSesHandler) SendMail(to string, title string, body string) error {
+	return nil
+}
+
 func TestShouldCreateUserAndLogin(t *testing.T) {
 	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
@@ -16,6 +22,7 @@ func TestShouldCreateUserAndLogin(t *testing.T) {
 		IdCounterRepository: &repository.IdCounterRepository{
 			DynamoDBHandler: dynamoDbHandler,
 		},
+		SesHandler: &MockSesHandler{},
 	}
 
 	params := UserInteractorCreateParams{

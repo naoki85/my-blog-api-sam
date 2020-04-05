@@ -15,6 +15,18 @@ import (
 type UserInteractor struct {
 	UserRepository      UserRepository
 	IdCounterRepository IdCounterRepository
+	SesHandler          SesHandler
+}
+
+type UserRepository interface {
+	FindByEmail(string) (model.User, error)
+	FindByAuthenticationToken(string) (model.User, error)
+	UpdateAttribute(string, string, string) error
+	Create(repository.UserCreateParams) error
+}
+
+type SesHandler interface {
+	SendMail(string, string, string) error
 }
 
 type UserInteractorCreateParams struct {
@@ -120,6 +132,7 @@ func (interactor *UserInteractor) CheckAuthenticationToken(authenticationToken s
 
 func (interactor *UserInteractor) updateToken(user *model.User) error {
 	authenticationToken := interactor.generateToken()
+	interactor.SesHandler.SendMail(user.Email, "Test", authenticationToken)
 	err := interactor.UserRepository.UpdateAttribute(user.Email, "AuthenticationToken", authenticationToken)
 	if err != nil {
 		log.Printf("%s", err.Error())

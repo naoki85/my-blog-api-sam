@@ -82,7 +82,8 @@ func requireLogin(f func(events.APIGatewayProxyRequest) (events.APIGatewayProxyR
 
 	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
-	userController := controller.NewUserController(dynamoDbHandler)
+	sesHandler, _ := infrastructure.NewSesHandler(c)
+	userController := controller.NewUserController(dynamoDbHandler, &sesHandler)
 	_, status := userController.LoginStatus(authenticationToken)
 	if status != config.SuccessStatus {
 		return handleError(config.UnauthorizedStatus), nil
@@ -138,7 +139,8 @@ func posts(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 		all = false
 	} else {
 		authenticationToken := strings.Split(header, " ")[1]
-		userController := controller.NewUserController(dynamoDbHandler)
+		sesHandler, _ := infrastructure.NewSesHandler(c)
+		userController := controller.NewUserController(dynamoDbHandler, &sesHandler)
 		_, status := userController.LoginStatus(authenticationToken)
 		all = status == config.SuccessStatus
 	}
@@ -259,7 +261,8 @@ func createUser(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRe
 
 	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
-	userController := controller.NewUserController(dynamoDbHandler)
+	sesHandler, _ := infrastructure.NewSesHandler(c)
+	userController := controller.NewUserController(dynamoDbHandler, &sesHandler)
 
 	res, status := userController.Create(params)
 	if status != config.SuccessStatus {
@@ -300,7 +303,8 @@ func login(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 
 	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
-	userController := controller.NewUserController(dynamoDbHandler)
+	sesHandler, _ := infrastructure.NewSesHandler(c)
+	userController := controller.NewUserController(dynamoDbHandler, &sesHandler)
 
 	res, status := userController.Login(params)
 	if status != config.SuccessStatus {
@@ -315,7 +319,8 @@ func logout(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespon
 
 	c := initConf()
 	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
-	userController := controller.NewUserController(dynamoDbHandler)
+	sesHandler, _ := infrastructure.NewSesHandler(c)
+	userController := controller.NewUserController(dynamoDbHandler, &sesHandler)
 
 	res, status := userController.Logout(authenticationToken)
 	if status != config.SuccessStatus {

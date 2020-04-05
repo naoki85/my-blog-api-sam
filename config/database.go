@@ -13,6 +13,7 @@ type Config struct {
 	Database         string
 	DynamoDbEndpoint string
 	S3Endpoint       string
+	SesEndpoint      string
 }
 
 var instance *Config
@@ -30,6 +31,7 @@ func InitDbConf(env string) {
 				Database:         "book_recorder_test",
 				DynamoDbEndpoint: "http://localhost:3307",
 				S3Endpoint:       "http://localhost:9000",
+				SesEndpoint:      "",
 			}
 		} else {
 			instance = &Config{
@@ -40,6 +42,7 @@ func InitDbConf(env string) {
 				Database:         os.Getenv("DBNAME"),
 				DynamoDbEndpoint: os.Getenv("DYNAMODB_ENDPOINT"),
 				S3Endpoint:       os.Getenv("S3_ENDPOINT"),
+				SesEndpoint:      os.Getenv("SES_ENDPOINT"),
 			}
 		}
 	})

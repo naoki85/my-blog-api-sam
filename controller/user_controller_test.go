@@ -8,10 +8,12 @@ import (
 	"testing"
 )
 
+var mockSesHandler = testSupport.SetupMockSesHandler()
+
 func TestShouldCreateUser(t *testing.T) {
 	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
-	controller := NewUserController(dynamoDbHandler)
+	controller := NewUserController(dynamoDbHandler, &mockSesHandler)
 
 	params := usecase.UserInteractorCreateParams{
 		Email:    "test@example.com",
@@ -27,7 +29,7 @@ func TestShouldCreateUser(t *testing.T) {
 func TestShouldUserLoginAndLogout(t *testing.T) {
 	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
-	controller := NewUserController(dynamoDbHandler)
+	controller := NewUserController(dynamoDbHandler, &mockSesHandler)
 	params := usecase.UserInteractorCreateParams{
 		Email:    "test@example.com",
 		Password: "password",
@@ -68,7 +70,7 @@ func TestShouldUserLoginAndLogout(t *testing.T) {
 func TestCheckLoginStatus(t *testing.T) {
 	dynamoDbHandler, tearDown := testSupport.SetupTestDynamoDb()
 	defer tearDown()
-	controller := NewUserController(dynamoDbHandler)
+	controller := NewUserController(dynamoDbHandler, &mockSesHandler)
 	params := usecase.UserInteractorCreateParams{
 		Email:    "test@example.com",
 		Password: "password",

@@ -16,7 +16,11 @@ type UserController struct {
 	Interactor usecase.UserInteractor
 }
 
-func NewUserController(dynamoDbHandler *dynamodb.DynamoDB) *UserController {
+type SesHandler interface {
+	SendMail(string, string, string) error
+}
+
+func NewUserController(dynamoDbHandler *dynamodb.DynamoDB, sesHandler SesHandler) *UserController {
 	return &UserController{
 		Interactor: usecase.UserInteractor{
 			UserRepository: &repository.UserRepository{
@@ -25,6 +29,7 @@ func NewUserController(dynamoDbHandler *dynamodb.DynamoDB) *UserController {
 			IdCounterRepository: &repository.IdCounterRepository{
 				DynamoDBHandler: dynamoDbHandler,
 			},
+			SesHandler: sesHandler,
 		},
 	}
 }
