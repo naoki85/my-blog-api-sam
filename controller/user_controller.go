@@ -52,8 +52,26 @@ func (controller *UserController) Create(params usecase.UserInteractorCreatePara
 	return resp, config.SuccessStatus
 }
 
-func (controller *UserController) Login(params usecase.UserInteractorCreateParams) ([]byte, int) {
-	user, err := controller.Interactor.Login(params)
+func (controller *UserController) Login(params usecase.UserInteractorLoginParams) ([]byte, int) {
+	_, err := controller.Interactor.Login(params)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return []byte{}, config.InvalidParameterStatus
+	}
+
+	data := struct {
+		Message string
+	}{"success"}
+	resp, err := json.Marshal(data)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return resp, config.InternalServerErrorStatus
+	}
+	return resp, config.SuccessStatus
+}
+
+func (controller *UserController) OnetimeToken(params usecase.UserInteractorOnetimeTokenParams) ([]byte, int) {
+	user, err := controller.Interactor.OnetimeToken(params)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return []byte{}, config.InvalidParameterStatus

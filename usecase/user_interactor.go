@@ -35,6 +35,15 @@ type UserInteractorCreateParams struct {
 	Password string
 }
 
+type UserInteractorLoginParams struct {
+	Email string
+}
+
+type UserInteractorOnetimeTokenParams struct {
+	Email        string
+	OnetimeToken string
+}
+
 var randSrc = rand.NewSource(time.Now().UnixNano())
 
 const (
@@ -73,17 +82,54 @@ func (interactor *UserInteractor) Create(params UserInteractorCreateParams) (err
 	return interactor.UserRepository.Create(userCreateParams)
 }
 
-func (interactor *UserInteractor) Login(params UserInteractorCreateParams) (model.User, error) {
+func (interactor *UserInteractor) Login(params UserInteractorLoginParams) (model.User, error) {
 	user, err := interactor.UserRepository.FindByEmail(params.Email)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return user, err
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.EncryptedPassword), []byte(params.Password))
+
+	token := rand2String(6)
+	err = interactor.updateOnetimeToken(&user, token)
 	if err != nil {
 		log.Printf("%s", err.Error())
 		return user, err
 	}
+	err = interactor.SesHandler.SendMail(user.Email, "ワンタイムパスワードの送付", token)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return user, err
+	}
+
+	return user, err
+}
+
+func (interactor *UserInteractor) OnetimeToken(params UserInteractorOnetimeTokenParams) (model.User, error) {
+	user, err := interactor.UserRepository.FindByEmail(params.Email)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return user, err
+	}
+
+	if params.OnetimeToken != user.OnetimeToken {
+		err = errors.New("invalid onetime token")
+		log.Println(err.Error())
+		return user, err
+	}
+
+	layout := "2006-01-02 15-04-05"
+	loc, _ := time.LoadLocation("Asia/Tokyo")
+	t, err := time.ParseInLocation(layout, user.OnetimeTokenExpiredAt, loc)
+	if err != nil {
+		log.Println(err.Error())
+		return user, err
+	}
+	now := time.Now()
+	if now.After(t) {
+		err = errors.New("onetime token expired")
+		log.Println(err.Error())
+	}
+
 	err = interactor.updateToken(&user)
 	if err != nil {
 		log.Printf("%s", err.Error())
@@ -130,9 +176,26 @@ func (interactor *UserInteractor) CheckAuthenticationToken(authenticationToken s
 	return user, err
 }
 
+func (interactor *UserInteractor) updateOnetimeToken(user *model.User, token string) error {
+	err := interactor.UserRepository.UpdateAttribute(user.Email, "OnetimeToken", token)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return err
+	}
+	expiredAt := time.Now().Add(5 * time.Minute).Format("2006-01-02 15-04-05")
+	err = interactor.UserRepository.UpdateAttribute(user.Email, "OnetimeTokenExpiredAt",
+		expiredAt)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return err
+	}
+	user.OnetimeToken = token
+	user.OnetimeTokenExpiredAt = expiredAt
+	return nil
+}
+
 func (interactor *UserInteractor) updateToken(user *model.User) error {
 	authenticationToken := interactor.generateToken()
-	interactor.SesHandler.SendMail(user.Email, "Test", authenticationToken)
 	err := interactor.UserRepository.UpdateAttribute(user.Email, "AuthenticationToken", authenticationToken)
 	if err != nil {
 		log.Printf("%s", err.Error())

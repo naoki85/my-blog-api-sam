@@ -12,6 +12,8 @@ type User struct {
 	ImageUrl                     string
 	AuthenticationToken          string
 	AuthenticationTokenExpiredAt string
+	OnetimeToken                 string
+	OnetimeTokenExpiredAt        string
 	CreatedAt                    string
 	UpdatedAt                    string
 }

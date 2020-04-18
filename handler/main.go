@@ -65,6 +65,8 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		return login(request)
 	} else if request.HTTPMethod == "DELETE" && request.Path == "/logout" {
 		return logout(request)
+	} else if request.HTTPMethod == "POST" && request.Path == "/users/onetime_token" {
+		return onetimeToken(request)
 	} else if request.HTTPMethod == "PUT" && request.Path == "/upload" {
 		return requireLogin(getSignedUrl, request)
 	}
@@ -294,7 +296,7 @@ func getSignedUrl(request events.APIGatewayProxyRequest) (events.APIGatewayProxy
 }
 
 func login(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	var params usecase.UserInteractorCreateParams
+	var params usecase.UserInteractorLoginParams
 	requestBody := []byte(request.Body)
 	err := json.Unmarshal(requestBody, &params)
 	if err != nil {
@@ -307,6 +309,26 @@ func login(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespons
 	userController := controller.NewUserController(dynamoDbHandler, &sesHandler)
 
 	res, status := userController.Login(params)
+	if status != config.SuccessStatus {
+		return handleError(status), nil
+	}
+	return apiResponse(fmt.Sprintf("%s", res), status), nil
+}
+
+func onetimeToken(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	var params usecase.UserInteractorOnetimeTokenParams
+	requestBody := []byte(request.Body)
+	err := json.Unmarshal(requestBody, &params)
+	if err != nil {
+		return handleError(400), nil
+	}
+
+	c := initConf()
+	dynamoDbHandler, _ := infrastructure.NewDynamoDbHandler(c)
+	sesHandler, _ := infrastructure.NewSesHandler(c)
+	userController := controller.NewUserController(dynamoDbHandler, &sesHandler)
+
+	res, status := userController.OnetimeToken(params)
 	if status != config.SuccessStatus {
 		return handleError(status), nil
 	}
